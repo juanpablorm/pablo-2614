@@ -1,13 +1,21 @@
 import { LogOut } from 'lucide-react';
+import { useMemo } from 'react';
 
 import logoUrl from '@/assets/snailracer-logo.svg';
 import { Button } from '@/components/ui/Button';
+import { Card, CardTitle } from '@/components/ui/Card';
 import { useAuth } from '@/features/auth/useAuth';
+import { BetsDonutChart } from '@/features/stats/components/BetsDonutChart';
+import { RaceResultsList } from '@/features/stats/components/RaceResultsList';
+import { SnailWinsBarChart } from '@/features/stats/components/SnailWinsBarChart';
+import { generateRaceDay, toLocalDateSeed } from '@/features/stats/mockRaceDay';
+import { BalanceCard } from '@/features/wallet/components/BalanceCard';
 import { getBalanceCents } from '@/features/wallet/walletService';
-import { formatCents } from '@/lib/money';
 
 export function DashboardPage() {
   const { user, logout } = useAuth();
+  // La semilla es la fecha local: los datos no cambian al recargar durante el día.
+  const raceDay = useMemo(() => generateRaceDay(toLocalDateSeed()), []);
   // ProtectedRoute garantiza la sesión; esto solo satisface al tipo.
   if (!user) return null;
 
@@ -44,18 +52,38 @@ export function DashboardPage() {
 
       <main className="mx-auto max-w-(--container-content) px-4 py-10">
         <h1 className="mb-8 text-[40px] font-semibold tracking-[-0.01em]">Hola, {user.fullName}</h1>
-        <section aria-labelledby="balance-title" className="max-w-md bg-text p-8 text-bg">
-          <h2
-            id="balance-title"
-            className="font-body text-sm font-bold tracking-[0.08em] text-surface uppercase"
-          >
-            Saldo disponible
-          </h2>
-          <p className="mt-3 font-display text-[56px] leading-none font-semibold tracking-[-0.02em]">
-            {formatCents(balanceCents)}
-          </p>
-          <p className="mt-2 text-sm text-surface">MXN</p>
-        </section>
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          <BalanceCard balanceCents={balanceCents} />
+
+          <Card aria-labelledby="wins-title" className="lg:col-span-2">
+            <CardTitle id="wins-title" className="mb-5">
+              Victorias por caracol
+            </CardTitle>
+            <SnailWinsBarChart winsBySnail={raceDay.winsBySnail} />
+          </Card>
+
+          <Card aria-labelledby="bets-title">
+            <CardTitle id="bets-title" className="mb-5">
+              Apuestas del día
+            </CardTitle>
+            <BetsDonutChart summary={raceDay.betsSummary} />
+          </Card>
+
+          <Card aria-labelledby="races-title" className="lg:col-span-2">
+            <CardTitle id="races-title" className="mb-5">
+              Resultados de las carreras
+            </CardTitle>
+            <RaceResultsList races={raceDay.races} bets={raceDay.bets} />
+          </Card>
+
+          <Card aria-labelledby="history-title" className="lg:col-span-3">
+            <CardTitle id="history-title" className="mb-5">
+              Historial de recargas
+            </CardTitle>
+            <p className="text-text-muted">Aún no tienes recargas.</p>
+          </Card>
+        </div>
       </main>
     </div>
   );

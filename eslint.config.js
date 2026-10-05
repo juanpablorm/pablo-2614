@@ -38,5 +38,16 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
 
+  // Datos simulados: deterministas con semilla (docs/architecture.md §6).
+  {
+    files: ['apps/web/src/lib/prng.ts', 'apps/web/src/features/stats/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-properties': [
+        'error',
+        { object: 'Math', property: 'random', message: 'Usa createRng(seed) de lib/prng.ts.' },
+      ],
+    },
+  },
+
   prettier,
 ]);

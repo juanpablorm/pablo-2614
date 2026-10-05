@@ -221,17 +221,20 @@ Padding `4px 12px`, 13px/700, radio 0.
 
 **Barras: victorias por caracol** (Recharts)
 
-- Barras `#F07E13`; el líder en `#D9A52E` con corona encima (empates: pendiente P6).
-- Valor en Fredoka 18px sobre cada barra; nombre debajo en 14px/600.
-- Altura proporcional (máx. 170px), ancho máx. 68px, eje base `3px solid #432304`.
+- Barras `#F07E13`; los líderes en `#D9A52E`. En empate se resaltan todos (P6). Encima, texto con ícono de corona: "Líder: Carloscol · 2 victorias" o "Empate en el primer lugar: …", para no depender solo del color.
+- **Desde 640px:** barras verticales; valor en Fredoka 18px sobre cada barra; nombre debajo en 13px/600; eje Y solo con enteros. Alto del área 240px, ancho máx. de barra 68px, eje base `3px solid #432304`.
+- **Debajo de 640px:** barras horizontales para que el nombre se lea completo: nombre a la izquierda (13px/600, eje base `3px solid #432304`), valor a la derecha de cada barra, eje de valores solo con enteros. Alto del área 260px, grosor máx. de barra 28px.
+- `role="img"` con `aria-label` que lista las victorias de cada caracol.
 
 **Donut: apuestas ganadas vs. perdidas** (Recharts)
 
 - Donut de 170px de diámetro, grosor del anillo 20px, sin separación entre segmentos.
 - Segmento de ganadas `#58613A`, segmento de perdidas `#B95332`; tamaño proporcional al conteo.
-- A la derecha: porcentaje Fredoka 48px en `#58613A` + "efectividad" 14px.
-- Leyenda debajo con cuadro (ganadas) y círculo (perdidas).
+- Al centro: porcentaje Fredoka 40px en `#58613A` + "efectividad" 14px.
+- Leyenda debajo con cuadro (ganadas) y círculo (perdidas), con los conteos.
 - `role="img"` con `aria-label` que diga los conteos; sin depender del tooltip para la información.
+
+**Ambas gráficas** llevan la etiqueta visible "Datos de demostración del día" y se dibujan sin animación de entrada. Debajo, la lista "Resultados de las carreras" ("Carrera 1: ganó Carloscol") hace visible que barras y donut salen de las mismas carreras.
 
 ---
 
@@ -308,7 +311,7 @@ Es la única parte con explicación detallada; el resto del sitio usa el mínimo
 
 - Páginas fluidas, no de ancho fijo; diseño base a 1440px.
 - **Auth:** dos columnas (`flex: 1 1 520px` marca / `flex: 1 1 560px` formulario) que se apilan en pantallas angostas.
-- **Dashboard:** filas de cards `flex-wrap` con proporción 1:2 (`flex: 1 1 340px` / `flex: 2 1 560px`); en celular quedan en una columna.
+- **Dashboard:** filas de cards `flex-wrap` con proporción 1:2 (`flex: 1 1 340px` / `flex: 2 1 560px`); en celular quedan en una columna y la gráfica de victorias cambia a barras horizontales (< 640px).
 - El header hace wrap; la tabla hace scroll horizontal dentro de su caja.
 - Áreas táctiles de 44px como mínimo.
 

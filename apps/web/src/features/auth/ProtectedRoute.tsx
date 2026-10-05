@@ -1,5 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
 
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
+
 import { useAuth } from './useAuth';
 
 /** Solo con sesión activa. Sin sesión → /login, recordando la ruta de origen. */
@@ -7,13 +9,7 @@ export function ProtectedRoute() {
   const { status } = useAuth();
   const location = useLocation();
 
-  if (status === 'loading') {
-    return (
-      <div className="flex min-h-dvh items-center justify-center" aria-busy="true">
-        <span className="text-text-muted">Cargando…</span>
-      </div>
-    );
-  }
+  if (status === 'loading') return <LoadingScreen />;
 
   if (status === 'anonymous') {
     return <Navigate to="/login" replace state={{ from: location }} />;

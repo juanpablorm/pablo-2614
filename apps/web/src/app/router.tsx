@@ -2,7 +2,7 @@ import type { RouteObject } from 'react-router';
 
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { PublicOnlyRoute } from '@/features/auth/PublicOnlyRoute';
-import { DashboardPage } from '@/pages/DashboardPage';
+import { LazyDashboardPage } from '@/pages/LazyDashboardPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { RegisterPage } from '@/pages/RegisterPage';
@@ -20,7 +20,7 @@ export const routes: RouteObject[] = [
   },
   {
     element: <ProtectedRoute />,
-    children: [{ path: '/dashboard', element: <DashboardPage /> }],
+    children: [{ path: '/dashboard', element: <LazyDashboardPage /> }],
   },
   { path: '*', element: <NotFoundPage /> },
 ];

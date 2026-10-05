@@ -43,7 +43,7 @@ snailracer/
 │   ├── web/                              # React + Vite + TS
 │   │   ├── src/
 │   │   │   ├── app/                      # App.tsx, router.tsx, providers.tsx
-│   │   │   ├── pages/                    # RegisterPage, LoginPage, DashboardPage, NotFoundPage
+│   │   │   ├── pages/                    # RegisterPage, LoginPage, DashboardPage (+ LazyDashboardPage), NotFoundPage
 │   │   │   ├── features/
 │   │   │   │   ├── auth/
 │   │   │   │   │   ├── components/       # RegisterForm, LoginForm
@@ -65,8 +65,8 @@ snailracer/
 │   │   │   │       ├── components/       # BetsDonutChart, SnailWinsBarChart, RaceResultsList
 │   │   │   │       ├── mockRaceDay.ts    # generador determinista del día
 │   │   │   │       └── snails.ts         # catálogo de 6 caracoles
-│   │   │   ├── components/ui/            # Button, Input, Card, Dialog, Toast (base shadcn/ui)
-│   │   │   ├── lib/                      # storage.ts, http.ts, prng.ts, money.ts
+│   │   │   ├── components/ui/            # Button, Input, Card, Dialog, Toast, LoadingScreen (base shadcn/ui)
+│   │   │   ├── lib/                      # storage.ts, http.ts, prng.ts, money.ts, useMediaQuery.ts
 │   │   │   ├── styles/index.css          # Tailwind + tokens de diseño
 │   │   │   ├── assets/                   # snailracer-logo.svg
 │   │   │   └── main.tsx
@@ -243,9 +243,21 @@ generateRaceDay(seed: string): RaceDay
 // seed = fecha local AAAA-MM-DD → mismos datos al recargar la página
 ```
 
-- PRNG con semilla (mulberry32), nunca `Math.random`.
+```ts
+interface RaceDay {
+  seed: string;
+  races: { number: number; winnerId: SnailId }[]; // 6, un ganador cada una
+  bets: { id: string; raceNumber: number; snailId: SnailId; won: boolean }[];
+  winsBySnail: { snail: Snail; wins: number }[]; // los 6, incluidos los de 0
+  betsSummary: { won: number; lost: number; total: number };
+}
+```
+
+- PRNG con semilla (`lib/prng.ts`: hash FNV-1a de la cadena → mulberry32), nunca `Math.random` (ESLint lo prohíbe en `lib/prng.ts` y `features/stats`).
 - 6 caracoles fijos en `snails.ts`; 6 carreras con un ganador cada una.
 - 1 a 3 apuestas simuladas por carrera; ganada si el caracol apostado ganó esa carrera.
+- `winsBySnail` y `betsSummary` se derivan de `races` y `bets`, nunca se generan por separado.
+- `RaceResultsList` muestra el ganador de cada carrera para que la congruencia sea visible.
 
 **Invariantes (probadas):**
 
