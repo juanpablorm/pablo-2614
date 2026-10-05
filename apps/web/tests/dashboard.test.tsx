@@ -1,24 +1,10 @@
 import { screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { generateRaceDay } from '@/features/stats/mockRaceDay';
 import { getSnail } from '@/features/stats/snails';
 
-import { renderApp } from './utils/renderApp';
-
-const PASSWORD = 'Caracol123';
-
-async function registerAndOpenDashboard() {
-  const user = userEvent.setup();
-  renderApp('/registro');
-  await user.type(await screen.findByLabelText('Nombre completo'), 'Arturo Torres');
-  await user.type(screen.getByLabelText('Correo electrónico'), 'art@example.com');
-  await user.type(screen.getByLabelText('Contraseña'), PASSWORD);
-  await user.type(screen.getByLabelText('Confirmar contraseña'), PASSWORD);
-  await user.click(screen.getByRole('button', { name: 'Crear cuenta' }));
-  await screen.findByRole('heading', { level: 1, name: 'Hola, Arturo Torres' });
-}
+import { registerAndOpenDashboard } from './utils/registerAndOpenDashboard';
 
 describe('dashboard', () => {
   beforeEach(() => {

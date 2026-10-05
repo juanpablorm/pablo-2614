@@ -202,7 +202,7 @@ Padding `4px 12px`, 13px/700, radio 0.
 
 - Contenedor `#FDF2E7` con `overflow-x: auto`, ancho mín. 520px.
 - Celdas `14px 18px`, separador `1.5px solid #E9D8C7`.
-- Tarjeta siempre enmascarada (últimos 4 dígitos) con ícono de tarjeta en `#7A5634`. El formato exacto queda pendiente (P7 en CONTEXT.md): no hay detección de marca.
+- Tarjeta siempre enmascarada (últimos 4 dígitos) con ícono de tarjeta en `#7A5634`. Formato `•••• 1234` en la columna "Tarjeta", sin detección de marca (P7). El CVV nunca se muestra.
 
 ### Header (dashboard)
 
@@ -251,12 +251,13 @@ Es la única parte con explicación detallada; el resto del sitio usa el mínimo
 | Error / timeout | Reloj, círculo `#D9A52E` | Esto tardó demasiado | **Reintentar** · Ver historial                |
 
 - Ícono de estado: 92px con halo de 10px (ver sombras).
-- **Formulario:** número de tarjeta, vencimiento, CVV, chips de monto ($100, $200, $500, $1,000) + monto libre (mín. $50, ver P3).
+- **Formulario:** número de tarjeta, vencimiento, CVV, nombre en la tarjeta (prellenado con el nombre del usuario), chips de monto ($100, $200, $500, $1,000) + monto libre (mín. $50, sin tope en el cliente; P3).
   - Caja de resumen en `#E9D8C7`: cuánto se cobra y cuándo se suma al saldo.
   - **Aviso de datos de prueba:** "Usa solo tarjetas de prueba. Esta demo guarda los datos de la tarjeta en tu navegador." (No prometer que solo se guardan los últimos 4 dígitos: el contrato guarda número y CVV ficticios.)
 - **Aprobado:** resumen con tarjeta enmascarada, fecha y nuevo saldo, más confeti en dorado, naranja y verde.
 - **Rechazado:** aclarar que **no se hizo ningún cobro**.
-- **Timeout:** indicar que no se aplicó ningún cargo, mostrar la referencia y permitir reintentar (copy final pendiente P8; títulos propios para `service_unavailable` e `internal_error`).
+- **Timeout:** indicar que no se aplicó ningún cargo, mostrar la referencia y permitir reintentar (P8: título "Esto tardó demasiado" para timeout, "Servicio no disponible" para `service_unavailable` y "No se pudo completar la recarga" para `internal_error` y `network_error`).
+- El botón de ícono para cerrar se llama "Cerrar ventana" para no repetir el nombre de la acción "Cerrar".
 - Semántica: `role="dialog"` para formulario y aprobado, `role="alertdialog"` para rechazado y timeout, `aria-busy="true"` mientras procesa.
 
 ---

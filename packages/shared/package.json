@@ -17,5 +17,8 @@
     "build": "tsc -b",
     "dev": "tsc -b --watch --preserveWatchOutput",
     "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
   }
 }

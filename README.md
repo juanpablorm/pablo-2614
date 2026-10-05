@@ -38,4 +38,23 @@ docs/            Arquitectura, contrato del API y guía de estilos
 
 > Nota: abre la app en `localhost` o por HTTPS. El registro usa Web Crypto, que no funciona en `http://` por IP de red.
 
-Las instrucciones completas (tarjetas de prueba, despliegue) se agregan cuando las funcionalidades estén listas.
+## Tarjetas de prueba (SnailPay)
+
+Con `npm run dev`, inicia sesión y usa **Recargar** en el dashboard. Para todas: nombre no vacío y monto de al menos $50 (mínimo de la UI). Detalle completo en [`docs/snailpay-api.md`](docs/snailpay-api.md).
+
+| Tarjeta               | Vencimiento | CVV        | Resultado                                                             |
+| --------------------- | ----------- | ---------- | --------------------------------------------------------------------- |
+| `1234 1234 1234 1234` | `12/26`     | `543`      | **Aprobada**: suma el monto al saldo                                  |
+| `1234 1234 1234 1234` | `12/26`     | otro       | Rechazada: CVV incorrecto                                             |
+| `1234 1234 1234 1234` | otra        | `543`      | Rechazada: fecha incorrecta                                           |
+| `1234 1234 1234 1234` | `12/26`     | `543`      | Rechazada si el monto es mayor a $10,000                              |
+| `4000 0000 0000 0002` | cualquiera  | cualquiera | Rechazada: fondos insuficientes                                       |
+| `4000 0000 0000 0069` | cualquiera  | cualquiera | Rechazada: tarjeta rechazada (igual que cualquier tarjeta no listada) |
+| `9999 9999 9999 9999` | cualquiera  | cualquiera | Error: servicio no disponible                                         |
+| `8888 8888 8888 8888` | cualquiera  | cualquiera | Timeout: el cliente se rinde a los 8 s                                |
+
+Solo la aprobada cambia el saldo. Para simular una caída total del servicio:
+
+```powershell
+$env:SNAILPAY_SIMULATE_OUTAGE="true"; npm run dev -w @snailracer/api
+```

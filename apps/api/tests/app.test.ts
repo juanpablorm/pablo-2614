@@ -16,10 +16,11 @@ describe('app base', () => {
     expect(res.body).toEqual({ error: 'not_found' });
   });
 
-  it('aún no expone el endpoint de cobros (Fase 3)', async () => {
+  it('expone POST /charges en la ruta del contrato', async () => {
     const res = await request(app).post(`${SNAILPAY_BASE_PATH}/charges`).send({});
 
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(400);
+    expect(res.body).toMatchObject({ status: 'rejected', status_detail: 'invalid_request' });
   });
 
   it('agrega cabeceras de seguridad y oculta x-powered-by', async () => {

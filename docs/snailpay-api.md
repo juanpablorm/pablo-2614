@@ -35,7 +35,13 @@ Crea un cobro y devuelve su resultado de forma síncrona. Todas las respuestas, 
 | `Content-Type: application/json` | Sí          |                                                                                                                                                                                                    |
 | `Idempotency-Key`                | No          | Cadena única por intento de cobro (UUID). Si se repite con el mismo body, el servicio devuelve la respuesta original en lugar de cobrar otra vez. Evita cobros dobles por doble clic o reintentos. |
 
-> Pendiente P1 (CONTEXT.md): cómo se conserva la respuesta original en un backend sin estado y qué ocurre si la key se repite con un body distinto.
+Comportamiento de la key (P1):
+
+- Se guarda en memoria del proceso durante 24 h (máximo 1,000 keys; se descartan las más viejas). Se pierde al reiniciar el API.
+- Misma key + mismo body (sin importar el orden de las claves) → se devuelve la respuesta original con su mismo código HTTP, aunque la primera solicitud aún se esté procesando.
+- Misma key + body distinto → **422** `rejected` / `invalid_request` con `errors: [{ "field": "Idempotency-Key", ... }]`.
+- Las respuestas con `status: "error"` (503, 500) no se guardan: un reintento con la misma key se procesa de nuevo.
+- Key vacía o de más de 255 caracteres → **400** `invalid_request`.
 
 ## 2. Solicitud
 
@@ -102,7 +108,9 @@ type ChargeStatusDetail =
   | 'amount_exceeds_limit'
   | 'service_unavailable'
   | 'internal_error'
-  | 'timeout'; // generado por el cliente, nunca por el servidor
+  // Generados por el cliente, nunca por el servidor:
+  | 'timeout'
+  | 'network_error';
 
 interface ChargeResponse {
   id: string;
@@ -143,7 +151,7 @@ Notas:
 
 - **Escenario 2:** el límite de 10,000 no es error de formato; montos mayores pasan la validación y caen en el escenario 7.
 - **Escenario 4:** `12/26` es la única fecha aceptada para la tarjeta de éxito. El servicio **no compara contra la fecha actual**, de modo que el caso exitoso sigue funcionando después de diciembre de 2026.
-- **Escenario 9:** el servidor tarda `SNAILPAY_SLOW_DELAY_MS` (15 s por defecto) en responder; el cliente aborta a los 8 s y construye localmente la respuesta `timeout`. Si el servidor responde después, la respuesta se descarta. (Pendiente P2: qué responde el servidor tras el retraso.)
+- **Escenario 9:** el servidor tarda `SNAILPAY_SLOW_DELAY_MS` (15 s por defecto) en responder; el cliente aborta a los 8 s y construye localmente la respuesta `timeout`. Si el servidor responde después, la respuesta se descarta. Tras el retraso el servidor responde **503** `error` / `service_unavailable`, nunca `approved` (P2).
 
 ## 5. Orden de evaluación
 
@@ -160,6 +168,8 @@ El servicio evalúa en este orden y se detiene en la primera regla que aplica. A
 5. Cualquier otra tarjeta → **402** `card_declined`.
 
 Cualquier excepción no prevista se captura en `errorHandler` → **500** `internal_error`.
+
+En esta ruta, los errores previos a la validación también usan la forma de la sección 3: JSON malformado → **400** `invalid_request` y body mayor a 10 KB → **413** `invalid_request`, ambos con `errors: [{ "field": "body", ... }]`.
 
 ## 6. Error del sistema y timeout
 
@@ -188,6 +198,17 @@ $env:SNAILPAY_SIMULATE_OUTAGE="true"; npm run dev -w @snailracer/api
 - Al abortar, genera localmente una `ChargeResponse` con `status: "error"`, `status_detail: "timeout"`, `authorization_code: null` y un `id` con prefijo `local_`.
 - El saldo **no cambia**. El mensaje indica que no se aplicó ningún cargo y que puede reintentar.
 - Mejora futura en un sistema real: consultar el estado del cobro por `id` o `Idempotency-Key` antes de reintentar, para conciliar cobros que sí se procesaron del lado del servidor.
+
+### Otras respuestas locales
+
+El cliente construye la misma respuesta local (prefijo `local_`, referencia `SNL-AAAAMMDD-LOCAL0`, `status: "error"`) cuando:
+
+| Situación                                                                                         | `status_detail`  |
+| ------------------------------------------------------------------------------------------------- | ---------------- |
+| No hubo respuesta (sin conexión, servidor caído)                                                  | `network_error`  |
+| La respuesta no cumple esta sección 3, o dice `approved` sin HTTP 201, sin código o con monto ≤ 0 | `internal_error` |
+
+En ningún caso cambia el saldo.
 
 ## 7. Ejemplos
 
@@ -331,6 +352,7 @@ El backend devuelve códigos estables; el frontend los traduce en `statusMessage
 | `service_unavailable`     | El servicio de pagos no está disponible en este momento. No se aplicó ningún cargo. Intenta más tarde. |
 | `internal_error`          | Ocurrió un error inesperado. No se aplicó ningún cargo.                                                |
 | `timeout`                 | La operación tardó demasiado. No se aplicó ningún cargo; puedes intentarlo de nuevo.                   |
+| `network_error`           | No pudimos conectar con el servicio de pagos. No se aplicó ningún cargo.                               |
 | (desconocido)             | No pudimos completar la recarga. No se aplicó ningún cargo.                                            |
 
 **Regla:** solo `status === "approved"` modifica el saldo. Cualquier otro valor, incluido uno desconocido, deja el saldo igual.

@@ -3,7 +3,7 @@
  * Toda lectura se valida con Zod: datos ausentes, corruptos o con otra forma devuelven null.
  * Ninguna función lanza: el almacenamiento puede estar bloqueado (modo privado, cuota, políticas).
  */
-import type { ChargeResponse } from '@snailracer/shared';
+import { chargeResponseSchema, type ChargeResponse } from '@snailracer/shared';
 import { z } from 'zod';
 
 export const STORAGE_PREFIX = 'snailracer:v1:';
@@ -44,33 +44,7 @@ export const walletSchema = z.object({
 });
 export type Wallet = z.infer<typeof walletSchema>;
 
-const chargeResponseSchema = z.object({
-  id: z.string(),
-  status: z.enum(['approved', 'rejected', 'error']),
-  status_detail: z.enum([
-    'accredited',
-    'invalid_request',
-    'invalid_security_code',
-    'invalid_expiration_date',
-    'insufficient_funds',
-    'card_declined',
-    'amount_exceeds_limit',
-    'service_unavailable',
-    'internal_error',
-    'timeout',
-  ]),
-  transaction_amount: z.number().nullable(),
-  date_created: z.string(),
-  authorization_code: z.string().nullable(),
-  reference: z.string(),
-  payer_id: z.string().nullable(),
-  payer_email: z.string().nullable(),
-  card_number: z.string().nullable(),
-  cvv: z.string().nullable(),
-  errors: z.array(z.object({ field: z.string(), message: z.string() })).optional(),
-}) satisfies z.ZodType<ChargeResponse>;
-
-/** Historial de cobros, el más reciente primero. */
+/** Historial de cobros, el más reciente primero. Misma forma que valida el API (shared). */
 export const chargesSchema = z.array(chargeResponseSchema);
 
 // --- Acceso de bajo nivel ---

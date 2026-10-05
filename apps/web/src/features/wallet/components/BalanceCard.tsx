@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+import type { Ref } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -7,10 +8,18 @@ import { formatCents } from '@/lib/money';
 
 interface BalanceCardProps {
   balanceCents: number;
+  onTopUp: () => void;
+  /** Botón Recargar: el modal regresa el foco aquí al cerrarse. */
+  topUpButtonRef?: Ref<HTMLButtonElement>;
   className?: string;
 }
 
-export function BalanceCard({ balanceCents, className }: BalanceCardProps) {
+export function BalanceCard({
+  balanceCents,
+  onTopUp,
+  topUpButtonRef,
+  className,
+}: BalanceCardProps) {
   return (
     <Card
       variant="highlight"
@@ -28,8 +37,7 @@ export function BalanceCard({ balanceCents, className }: BalanceCardProps) {
       </p>
       <p className="mt-2 text-sm text-surface">MXN</p>
       <div className="mt-auto pt-7">
-        {/* La recarga (modal de SnailPay) se conecta en la fase de wallet. */}
-        <Button>
+        <Button ref={topUpButtonRef} onClick={onTopUp} aria-haspopup="dialog">
           <Plus aria-hidden="true" className="size-5" />
           Recargar
         </Button>

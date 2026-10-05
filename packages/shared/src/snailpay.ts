@@ -1,6 +1,6 @@
 /**
  * Contrato de SnailPay (ver docs/snailpay-api.md, secciones 2 y 3).
- * Los esquemas de validación en tiempo de ejecución se agregan en la Fase 3.
+ * La validación en tiempo de ejecución de la respuesta está en schemas.ts.
  */
 
 export const SNAILPAY_BASE_PATH = '/api/snailpay/v1';
@@ -17,7 +17,9 @@ export type ChargeStatusDetail =
   | 'amount_exceeds_limit'
   | 'service_unavailable'
   | 'internal_error'
-  | 'timeout'; // generado por el cliente, nunca por el servidor
+  // Generados por el cliente, nunca por el servidor:
+  | 'timeout'
+  | 'network_error';
 
 export interface ChargeRequest {
   card_number: string;

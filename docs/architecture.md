@@ -57,16 +57,20 @@ snailracer/
 │   │   │   │   │   └── PublicOnlyRoute.tsx
 │   │   │   │   ├── wallet/
 │   │   │   │   │   ├── components/       # BalanceCard, TopUpDialog, TopUpForm, ChargeHistory
-│   │   │   │   │   ├── snailpayClient.ts # fetch con timeout (AbortController)
+│   │   │   │   │   ├── snailpayClient.ts # charge(): valida con Zod, respuestas locales de error
 │   │   │   │   │   ├── walletService.ts  # applyChargeResult: suma solo si approved
 │   │   │   │   │   ├── statusMessages.ts # status_detail → mensaje en español
+│   │   │   │   │   ├── schemas.ts        # Zod del formulario de recarga
+│   │   │   │   │   ├── cardFormat.ts     # máscaras y tarjeta enmascarada
+│   │   │   │   │   ├── chargeDisplay.ts  # fecha, monto y estado para la UI
+│   │   │   │   │   ├── useWallet.ts      # saldo e historial en estado de React
 │   │   │   │   │   └── useTopUp.ts       # estado del flujo de recarga
 │   │   │   │   └── stats/
 │   │   │   │       ├── components/       # BetsDonutChart, SnailWinsBarChart, RaceResultsList
 │   │   │   │       ├── mockRaceDay.ts    # generador determinista del día
 │   │   │   │       └── snails.ts         # catálogo de 6 caracoles
-│   │   │   ├── components/ui/            # Button, Input, Card, Dialog, Toast, LoadingScreen (base shadcn/ui)
-│   │   │   ├── lib/                      # storage.ts, http.ts, prng.ts, money.ts, useMediaQuery.ts
+│   │   │   ├── components/ui/            # Button, Input, Card, Dialog, FormField, SubmitButton, Alert, LoadingScreen
+│   │   │   ├── lib/                      # storage.ts, http.ts, env.ts, prng.ts, money.ts, useMediaQuery.ts
 │   │   │   ├── styles/index.css          # Tailwind + tokens de diseño
 │   │   │   ├── assets/                   # snailracer-logo.svg
 │   │   │   └── main.tsx
@@ -79,14 +83,15 @@ snailracer/
 │       │   ├── server.ts                 # solo listen
 │       │   ├── config/env.ts             # variables de entorno validadas con Zod
 │       │   ├── routes/snailpay.routes.ts
-│       │   ├── controllers/charges.controller.ts
+│       │   ├── controllers/charges.controller.ts  # Idempotency-Key + status_detail → HTTP
 │       │   ├── services/snailpay/
-│       │   │   ├── chargeService.ts      # orden de evaluación de reglas
+│       │   │   ├── chargeService.ts      # orden de evaluación de reglas (incluye la validación)
 │       │   │   ├── scenarios.ts          # tarjetas de prueba y su resultado
-│       │   │   └── responseFactory.ts    # construye la respuesta uniforme
-│       │   ├── middlewares/              # validate, errorHandler, notFound
+│       │   │   ├── responseFactory.ts    # construye la respuesta uniforme
+│       │   │   └── idempotencyStore.ts   # keys en memoria con TTL (P1)
+│       │   ├── middlewares/              # errorHandler, notFound
 │       │   └── schemas/charge.schema.ts
-│       ├── tests/charges.test.ts
+│       ├── tests/                        # charges, responseFactory, idempotencyStore, app, env
 │       └── .env.example
 ├── packages/shared/                      # tipos del contrato SnailPay (request/response)
 ├── docs/
@@ -119,17 +124,20 @@ snailracer/
 
 ### Backend
 
-| Capa                   | Responsabilidad                                                                                                                          |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `middlewares`          | Seguridad básica (helmet, cors con origen explícito), JSON con límite de tamaño, manejo central de errores                               |
-| `schemas` + `validate` | Validar el body con Zod; si falla → 400 `invalid_request` con la lista de campos                                                         |
-| `controller`           | Traducir el resultado del servicio a código HTTP; no conoce los escenarios                                                               |
-| `chargeService`        | Aplicar las reglas en orden y nunca aprobar de más                                                                                       |
-| `scenarios.ts`         | Tabla de tarjetas de prueba → resultado (agregar un escenario = una línea)                                                               |
-| `responseFactory`      | Construir la respuesta con los 11 campos, siempre con la misma forma                                                                     |
-| `config/env.ts`        | Leer y validar variables de entorno (`PORT`, `CORS_ORIGIN`, `SNAILPAY_SIMULATE_OUTAGE`, `SNAILPAY_SLOW_DELAY_MS`, `SNAILPAY_MAX_AMOUNT`) |
+| Capa               | Responsabilidad                                                                                                                          |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `middlewares`      | Seguridad básica (helmet, cors con origen explícito), JSON con límite de tamaño, manejo central de errores                               |
+| `schemas`          | Esquema Zod del body; si falla → 400 `invalid_request` con la lista de campos. Lo aplica `chargeService` después del outage (§5)         |
+| `controller`       | Validar el `Idempotency-Key`, consultar la store y traducir el resultado a código HTTP; no conoce los escenarios                         |
+| `chargeService`    | Aplicar las reglas en orden y nunca aprobar de más                                                                                       |
+| `idempotencyStore` | Repetir la respuesta original de una key; 422 si la key llega con otro body                                                              |
+| `scenarios.ts`     | Tabla de tarjetas de prueba → resultado (agregar un escenario = una línea)                                                               |
+| `responseFactory`  | Construir la respuesta con los 11 campos, siempre con la misma forma                                                                     |
+| `config/env.ts`    | Leer y validar variables de entorno (`PORT`, `CORS_ORIGIN`, `SNAILPAY_SIMULATE_OUTAGE`, `SNAILPAY_SLOW_DELAY_MS`, `SNAILPAY_MAX_AMOUNT`) |
 
-Rutas desconocidas del API responden `404 { "error": "not_found" }`; JSON malformado `400 { "error": "invalid_json" }`; body > 10 KB `413 { "error": "payload_too_large" }`. Las rutas de SnailPay usan siempre la forma del contrato.
+Rutas desconocidas del API responden `404 { "error": "not_found" }`; JSON malformado `400 { "error": "invalid_json" }`; body > 10 KB `413 { "error": "payload_too_large" }`. Las rutas de SnailPay usan siempre la forma del contrato, también en esos casos y en el 500.
+
+`chargeResponseSchema` (Zod) está en `packages/shared`: el frontend valida con él las respuestas y LocalStorage, y las pruebas del API validan cada respuesta con el mismo esquema.
 
 ## 4. Rutas y pantallas
 
@@ -274,8 +282,8 @@ interface RaceDay {
 | 402 `rejected`            | API                     | Motivo traducido de `status_detail`                                   | No                |
 | 503 `service_unavailable` | API                     | "El servicio de pagos no está disponible. No se aplicó ningún cargo." | No                |
 | Timeout (8 s)             | `snailpayClient`        | "La operación tardó demasiado. No se aplicó ningún cargo."            | No                |
-| Error de red              | `snailpayClient`        | "No pudimos conectar con el servicio de pagos."                       | No                |
-| Respuesta malformada      | Zod en `snailpayClient` | Mensaje genérico de error                                             | No                |
+| Error de red              | `snailpayClient`        | "No pudimos conectar con el servicio de pagos." (`network_error`)     | No                |
+| Respuesta malformada      | Zod en `snailpayClient` | Mensaje genérico de error (`internal_error` local)                    | No                |
 | LocalStorage corrupto     | `storage.ts`            | Se limpia la sesión, se envía a login                                 | No                |
 
 ## 8. Despliegue (opcional)

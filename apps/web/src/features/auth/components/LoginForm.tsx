@@ -2,14 +2,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import { Alert } from '@/components/ui/Alert';
+import { FormField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/Input';
+import { SubmitButton } from '@/components/ui/SubmitButton';
 
 import { AuthError } from '../authService';
 import { loginSchema, type LoginFormInput, type LoginFormValues } from '../schemas';
 import { useAuth } from '../useAuth';
-import { FormField } from './FormField';
 import { PasswordInput } from './PasswordInput';
-import { SubmitButton } from './SubmitButton';
 
 export function LoginForm() {
   const { login } = useAuth();
