@@ -1,0 +1,123 @@
+/**
+ * Único acceso a LocalStorage (CONTEXT.md, regla 8).
+ * Toda lectura se valida con Zod: datos ausentes, corruptos o con otra forma devuelven null.
+ * Ninguna función lanza: el almacenamiento puede estar bloqueado (modo privado, cuota, políticas).
+ */
+import type { ChargeResponse } from '@snailracer/shared';
+import { z } from 'zod';
+
+export const STORAGE_PREFIX = 'snailracer:v1:';
+
+export const storageKeys = {
+  users: `${STORAGE_PREFIX}users`,
+  session: `${STORAGE_PREFIX}session`,
+  wallet: (userId: string) => `${STORAGE_PREFIX}wallet:${userId}`,
+  charges: (userId: string) => `${STORAGE_PREFIX}charges:${userId}`,
+} as const;
+
+// --- Esquemas de lo que se guarda ---
+
+export const storedUserSchema = z.object({
+  id: z.uuid(),
+  fullName: z.string().min(1),
+  email: z.email(),
+  passwordHash: z.string().min(1),
+  salt: z.string().min(1),
+  iterations: z.int().positive(),
+  createdAt: z.iso.datetime(),
+});
+export type StoredUser = z.infer<typeof storedUserSchema>;
+
+/** Usuarios indexados por correo normalizado. */
+export const usersSchema = z.record(z.string(), storedUserSchema);
+export type StoredUsers = z.infer<typeof usersSchema>;
+
+export const sessionSchema = z.object({
+  userId: z.uuid(),
+  createdAt: z.iso.datetime(),
+  expiresAt: z.iso.datetime(),
+});
+export type Session = z.infer<typeof sessionSchema>;
+
+export const walletSchema = z.object({
+  balanceCents: z.int().nonnegative(),
+});
+export type Wallet = z.infer<typeof walletSchema>;
+
+const chargeResponseSchema = z.object({
+  id: z.string(),
+  status: z.enum(['approved', 'rejected', 'error']),
+  status_detail: z.enum([
+    'accredited',
+    'invalid_request',
+    'invalid_security_code',
+    'invalid_expiration_date',
+    'insufficient_funds',
+    'card_declined',
+    'amount_exceeds_limit',
+    'service_unavailable',
+    'internal_error',
+    'timeout',
+  ]),
+  transaction_amount: z.number().nullable(),
+  date_created: z.string(),
+  authorization_code: z.string().nullable(),
+  reference: z.string(),
+  payer_id: z.string().nullable(),
+  payer_email: z.string().nullable(),
+  card_number: z.string().nullable(),
+  cvv: z.string().nullable(),
+  errors: z.array(z.object({ field: z.string(), message: z.string() })).optional(),
+}) satisfies z.ZodType<ChargeResponse>;
+
+/** Historial de cobros, el más reciente primero. */
+export const chargesSchema = z.array(chargeResponseSchema);
+
+// --- Acceso de bajo nivel ---
+
+function read<T>(key: string, schema: z.ZodType<T>): T | null {
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (raw === null) return null;
+    const result = schema.safeParse(JSON.parse(raw));
+    return result.success ? result.data : null;
+  } catch {
+    return null;
+  }
+}
+
+function write(key: string, value: unknown): boolean {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function remove(key: string): boolean {
+  try {
+    window.localStorage.removeItem(key);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// --- API pública ---
+
+export const readUsers = () => read(storageKeys.users, usersSchema);
+export const writeUsers = (users: StoredUsers) => write(storageKeys.users, users);
+
+export const readSession = () => read(storageKeys.session, sessionSchema);
+export const writeSession = (session: Session) => write(storageKeys.session, session);
+export const clearSession = () => remove(storageKeys.session);
+
+export const readWallet = (userId: string) => read(storageKeys.wallet(userId), walletSchema);
+export const writeWallet = (userId: string, wallet: Wallet) =>
+  write(storageKeys.wallet(userId), wallet);
+
+export const readCharges = (userId: string): ChargeResponse[] | null =>
+  read(storageKeys.charges(userId), chargesSchema);
+export const writeCharges = (userId: string, charges: ChargeResponse[]) =>
+  write(storageKeys.charges(userId), charges);

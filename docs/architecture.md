@@ -48,6 +48,8 @@ snailracer/
 │   │   │   │   ├── auth/
 │   │   │   │   │   ├── components/       # RegisterForm, LoginForm
 │   │   │   │   │   ├── AuthContext.tsx   # estado de sesión + acciones
+│   │   │   │   │   ├── authContextValue.ts # contexto y tipos (separado por fast refresh)
+│   │   │   │   │   ├── useAuth.ts        # hook de acceso al contexto
 │   │   │   │   │   ├── authService.ts    # register, login, logout (lógica pura)
 │   │   │   │   │   ├── password.ts       # hashPassword, verifyPassword (PBKDF2)
 │   │   │   │   │   ├── schemas.ts        # Zod de registro y login

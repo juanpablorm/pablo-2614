@@ -102,6 +102,7 @@ Se permite usar asistentes de IA para análisis, diseño, código, pruebas y doc
 | Datos de tarjeta    | Se guardan completos (ficticios) por requisito; UI enmascarada; el modal no promete "solo últimos 4". |
 | Fuentes             | Auto-hospedadas con `@fontsource` (subconjunto latino).                                               |
 | Logo                | `snailracer-logo.svg`; prefijo de animaciones `sr-`.                                                  |
+| Contraseña y nombre | Nombre 3–80 caracteres tras `trim`; contraseña 8–128 con mayúscula, minúscula y número (P4).          |
 
 ### Pendientes (se resuelven al iniciar la fase indicada)
 
@@ -110,7 +111,6 @@ Se permite usar asistentes de IA para análisis, diseño, código, pruebas y doc
 | P1  | `Idempotency-Key` vs. backend sin estado; key repetida con body distinto.             | `Map` en memoria con TTL; body distinto → 422.              | 3    |
 | P2  | Respuesta del servidor para la tarjeta `8888…` tras el retraso.                       | 503 `service_unavailable`, nunca `approved`.                | 3    |
 | P3  | Mínimo $50 en UI vs. > 0 en API; bloquear > $10 000 en cliente oculta el escenario 7. | UI mín. $50; no bloquear > $10 000 en cliente.              | 5    |
-| P4  | Reglas de contraseña y nombre.                                                        | Contraseña ≥ 8; nombre 2–80 tras `trim`.                    | 2    |
 | P5  | Nombres de los 6 caracoles.                                                           | Tomarlos del diseño o proponerlos.                          | 4    |
 | P6  | Empate en victorias ("líder").                                                        | Resaltar a todos los empatados.                             | 4    |
 | P7  | Marca de tarjeta en historial ("Visa").                                               | Mostrar "Tarjeta •••• 1234".                                | 5    |
@@ -122,7 +122,7 @@ Se permite usar asistentes de IA para análisis, diseño, código, pruebas y doc
 | ------------------------------------------------ | -------------------------------------- |
 | Documentación de contexto, arquitectura y API    | Hecho                                  |
 | Setup del monorepo                               | Hecho                                  |
-| Auth (registro, login, logout, rutas protegidas) | Pendiente                              |
+| Auth (registro, login, logout, rutas protegidas) | Hecho                                  |
 | SnailPay (backend)                               | Pendiente                              |
 | Dashboard y gráficas                             | Pendiente                              |
 | Recarga de saldo (integración)                   | Pendiente                              |
