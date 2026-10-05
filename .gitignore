@@ -1,0 +1,22 @@
+# Dependencias
+node_modules/
+
+# Builds
+dist/
+*.tsbuildinfo
+
+# Pruebas
+coverage/
+
+# Variables de entorno (solo se versionan los .env.example)
+.env
+.env.*
+!.env.example
+
+# Editor / sistema
+.DS_Store
+Thumbs.db
+*.log
+
+# Configuración local de herramientas
+.claude/settings.local.json

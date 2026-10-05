@@ -1,0 +1,36 @@
+{
+  "name": "snailracer",
+  "private": true,
+  "type": "module",
+  "description": "Demo de apuestas en carreras de caracoles con pasarela de pagos simulada (SnailPay).",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "npm run build -w @snailracer/shared && concurrently -k -n shared,api,web -c gray,magenta,cyan \"npm run dev -w @snailracer/shared\" \"npm run dev -w @snailracer/api\" \"npm run dev -w @snailracer/web\"",
+    "build": "npm run build -w @snailracer/shared && npm run build -w @snailracer/api && npm run build -w @snailracer/web",
+    "typecheck": "npm run build -w @snailracer/shared && npm run typecheck --workspaces --if-present",
+    "test": "npm run build -w @snailracer/shared && npm run test --workspaces --if-present",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^24.19.1",
+    "concurrently": "^10.0.5",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.9",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.0"
+  }
+}

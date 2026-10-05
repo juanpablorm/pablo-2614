@@ -1,0 +1,21 @@
+{
+  "name": "@snailracer/shared",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Tipos y constantes del contrato SnailPay compartidos entre web y api.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsc -b --watch --preserveWatchOutput",
+    "typecheck": "tsc -b"
+  }
+}

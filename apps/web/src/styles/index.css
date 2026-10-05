@@ -1,0 +1,92 @@
+@import 'tailwindcss';
+
+/* Tokens de diseño (docs/styles.md, sección 10). Generan utilidades como bg-surface o text-text. */
+@theme {
+  /* Base */
+  --color-bg: #fdf2e7;
+  --color-text: #432304;
+  --color-primary: #f07e13;
+  --color-secondary: #58613a;
+  --color-surface: #e9d8c7;
+  --color-highlight: #d9a52e;
+  --color-accent: #b95332;
+
+  /* Derivados */
+  --color-text-muted: #7a5634;
+  --color-border: #8f7358;
+  --color-error-text: #8f3a1f;
+  --color-error-bg: #f3d9cc;
+  --color-success-text: #3d4426;
+  --color-success-bg: #dcddc6;
+  --color-warning-bg: #f2e1b8;
+  --color-surface-shadow: #d7c0a8;
+  --color-input-disabled: #f4e7d9;
+  --color-primary-disabled: #f3b47a;
+  --color-overlay: #977f6a;
+
+  /* Tipografía (auto-hospedada con @fontsource, ver main.tsx) */
+  --font-display: 'Fredoka', ui-rounded, system-ui, sans-serif;
+  --font-body: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Forma: esquinas rectas en todo. Lo circular usa rounded-full. */
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
+
+  /* Elevación (sombras sólidas) */
+  --shadow-cta: 0 4px 0 #b95332;
+  --shadow-card: 0 8px 0 #d7c0a8;
+  --shadow-modal: 0 24px 48px rgba(67, 35, 4, 0.35);
+
+  /* Medidas */
+  --container-content: 1200px;
+}
+
+:root {
+  --input-h: 50px;
+  --btn-h: 54px;
+  --touch-min: 44px;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
