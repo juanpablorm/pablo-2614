@@ -62,7 +62,12 @@ export function RegisterForm() {
         )}
       </FormField>
 
-      <FormField id="register-password" label="Contraseña" error={errors.password?.message}>
+      <FormField
+        id="register-password"
+        label="Contraseña"
+        hint="Mínimo 8 caracteres, con mayúscula, minúscula y número."
+        error={errors.password?.message}
+      >
         {(control) => (
           <PasswordInput {...control} autoComplete="new-password" {...register('password')} />
         )}
@@ -81,10 +86,6 @@ export function RegisterForm() {
           />
         )}
       </FormField>
-
-      <p className="text-[13px] text-text-muted">
-        Mínimo 8 caracteres, con mayúscula, minúscula y número.
-      </p>
 
       <SubmitButton loading={isSubmitting} loadingText="Creando cuenta…">
         Crear cuenta

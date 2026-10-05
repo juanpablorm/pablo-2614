@@ -34,8 +34,18 @@ export function ChargeHistory({ history }: ChargeHistoryProps) {
   }
 
   return (
-    <div className="overflow-x-auto bg-bg">
-      <table className="w-full min-w-[520px] border-collapse text-[15px]">
+    <div
+      role="region"
+      aria-label="Tabla de recargas"
+      // Enfocable para desplazar la tabla con las flechas en pantallas angostas.
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- región con scroll horizontal
+      tabIndex={0}
+      className="overflow-x-auto bg-bg"
+    >
+      <table
+        aria-labelledby="history-title"
+        className="w-full min-w-[520px] border-collapse text-[15px]"
+      >
         <thead>
           <tr>
             <th scope="col" className={headerCell}>

@@ -4,19 +4,14 @@ import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, XAxis, YAxis } fro
 import { cn } from '@/lib/cn';
 import { useMediaQuery } from '@/lib/useMediaQuery';
 
+import { CHART_COLORS } from '../chartColors';
 import { getLeaders, type SnailWins } from '../mockRaceDay';
 
 import { DemoDataBadge } from './DemoDataBadge';
 
-// Recharts necesita el color literal: tokens primary, highlight y text.
-const BAR_COLOR = '#F07E13';
-const LEADER_COLOR = '#D9A52E';
-const AXIS_COLOR = '#432304';
-const MUTED_COLOR = '#7A5634';
-
-const BASE_AXIS = { stroke: AXIS_COLOR, strokeWidth: 3 };
-const NAME_TICK = { fill: AXIS_COLOR, fontSize: 13, fontWeight: 600 };
-const VALUE_TICK = { fill: MUTED_COLOR, fontSize: 12 };
+const BASE_AXIS = { stroke: CHART_COLORS.axis, strokeWidth: 3 };
+const NAME_TICK = { fill: CHART_COLORS.axis, fontSize: 13, fontWeight: 600 };
+const VALUE_TICK = { fill: CHART_COLORS.muted, fontSize: 12 };
 
 const nameList = new Intl.ListFormat('es', { style: 'long', type: 'conjunction' });
 const victories = (wins: number) => `${wins} ${wins === 1 ? 'victoria' : 'victorias'}`;
@@ -50,13 +45,13 @@ export function SnailWinsBarChart({ winsBySnail }: SnailWinsBarChartProps) {
   const bar = (
     <Bar dataKey="wins" maxBarSize={isWide ? 68 : 28} isAnimationActive={false}>
       {data.map((entry) => (
-        <Cell key={entry.id} fill={entry.isLeader ? LEADER_COLOR : BAR_COLOR} />
+        <Cell key={entry.id} fill={entry.isLeader ? CHART_COLORS.leader : CHART_COLORS.bar} />
       ))}
       <LabelList
         dataKey="wins"
         position={isWide ? 'top' : 'right'}
         className="font-display"
-        fill={AXIS_COLOR}
+        fill={CHART_COLORS.axis}
         fontSize={18}
         fontWeight={600}
       />

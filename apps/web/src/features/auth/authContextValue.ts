@@ -2,7 +2,7 @@ import { createContext } from 'react';
 
 import type { LoginInput, PublicUser, RegisterInput } from './authService';
 
-export type AuthStatus = 'loading' | 'authenticated' | 'anonymous';
+export type AuthStatus = 'authenticated' | 'anonymous';
 
 export interface AuthContextValue {
   user: PublicUser | null;

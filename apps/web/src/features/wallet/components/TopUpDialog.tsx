@@ -1,22 +1,18 @@
 import type { ChargeResponse } from '@snailracer/shared';
-import { Check, Clock, X } from 'lucide-react';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 
 import { Alert } from '@/components/ui/Alert';
-import { Button } from '@/components/ui/Button';
 import { Dialog, DialogCloseButton } from '@/components/ui/Dialog';
 import type { PublicUser } from '@/features/auth/authService';
-import { cn } from '@/lib/cn';
-import { formatCents } from '@/lib/money';
 
-import { formatCardNumber, maskCardNumber } from '../cardFormat';
-import { formatChargeDate } from '../chargeDisplay';
+import { formatCardNumber } from '../cardFormat';
 import type { TopUpFormInput, TopUpFormValues } from '../schemas';
 import type { SnailpayClient } from '../snailpayClient';
 import { FALLBACK_MESSAGE, FALLBACK_TITLE, getChargeMessage } from '../statusMessages';
 import { useTopUp, type TopUpStatus } from '../useTopUp';
 import type { ApplyChargeResult } from '../walletService';
 import { TopUpForm } from './TopUpForm';
+import { ResultActions, ResultSummary, StatusIcon, type ResultStatus } from './TopUpResult';
 
 interface TopUpDialogProps {
   user: PublicUser;
@@ -34,22 +30,6 @@ const LIVE_ID = 'topup-result';
 
 const emptyCard = { cardNumber: '', expirationDate: '', cvv: '' };
 
-const STATUS_ICON = {
-  approved: {
-    Icon: Check,
-    className: 'bg-secondary text-bg shadow-[0_0_0_10px_var(--color-success-bg)]',
-  },
-  rejected: {
-    Icon: X,
-    className: 'bg-accent text-white shadow-[0_0_0_10px_var(--color-error-bg)]',
-  },
-  error: {
-    Icon: Clock,
-    className: 'bg-highlight text-text shadow-[0_0_0_10px_var(--color-warning-bg)]',
-  },
-} as const;
-
-type ResultStatus = Exclude<TopUpStatus, 'idle' | 'submitting'>;
 const isResult = (status: TopUpStatus): status is ResultStatus =>
   status !== 'idle' && status !== 'submitting';
 
@@ -136,7 +116,16 @@ export function TopUpDialog({
         </Alert>
       )}
 
-      {!showResult && (
+      {showResult ? (
+        <ResultActions
+          status={status}
+          primaryActionRef={primaryActionRef}
+          onClose={onClose}
+          onTryAnotherCard={tryAnotherCard}
+          onRetry={() => void retry()}
+          onShowHistory={onShowHistory}
+        />
+      ) : (
         <>
           <TopUpForm
             defaultValues={draft}
@@ -151,80 +140,6 @@ export function TopUpDialog({
           )}
         </>
       )}
-
-      {status === 'approved' && (
-        <div className="mt-6 flex">
-          <Button ref={primaryActionRef} onClick={onClose} className="h-[52px] w-full text-[17px]">
-            Listo
-          </Button>
-        </div>
-      )}
-      {status === 'rejected' && (
-        <div className="mt-6 flex flex-col gap-3">
-          <Button ref={primaryActionRef} onClick={tryAnotherCard} className="h-[52px] text-[17px]">
-            Probar con otra tarjeta
-          </Button>
-          <Button variant="secondary" onClick={onClose} className="h-[52px]">
-            Cerrar
-          </Button>
-        </div>
-      )}
-      {status === 'error' && (
-        <div className="mt-6 flex flex-col gap-3">
-          <Button
-            ref={primaryActionRef}
-            onClick={() => void retry()}
-            className="h-[52px] text-[17px]"
-          >
-            Reintentar
-          </Button>
-          <Button variant="secondary" onClick={onShowHistory} className="h-[52px]">
-            Ver historial
-          </Button>
-        </div>
-      )}
     </Dialog>
-  );
-}
-
-function StatusIcon({ status }: { status: ResultStatus }) {
-  const { Icon, className } = STATUS_ICON[status];
-  return (
-    <div
-      aria-hidden="true"
-      className={cn(
-        'mx-auto mb-6 flex size-[92px] items-center justify-center rounded-full',
-        className,
-      )}
-    >
-      <Icon className="size-11" strokeWidth={3} />
-    </div>
-  );
-}
-
-interface ResultSummaryProps {
-  response: ChargeResponse;
-  applied: ApplyChargeResult | null;
-  status: ResultStatus;
-}
-
-function ResultSummary({ response, applied, status }: ResultSummaryProps) {
-  const rows: [string, string][] = [
-    ['Tarjeta', maskCardNumber(response.card_number)],
-    ['Fecha', formatChargeDate(response.date_created)],
-  ];
-  if (status === 'approved' && applied)
-    rows.push(['Nuevo saldo', formatCents(applied.balanceCents)]);
-  rows.push(['Referencia', response.reference]);
-
-  return (
-    <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 bg-surface px-4 py-3.5 text-left text-[15px]">
-      {rows.map(([label, value]) => (
-        <div key={label} className="contents">
-          <dt className="text-text-muted">{label}</dt>
-          <dd className="text-right font-semibold">{value}</dd>
-        </div>
-      ))}
-    </dl>
   );
 }

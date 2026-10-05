@@ -68,6 +68,21 @@ describe('flujo de autenticación', () => {
     expect(window.localStorage.length).toBe(0);
   });
 
+  it('liga la regla de la contraseña y su error al campo', async () => {
+    const user = userEvent.setup();
+    renderApp('/registro');
+
+    const rule = 'Mínimo 8 caracteres, con mayúscula, minúscula y número.';
+    const password = await screen.findByLabelText('Contraseña');
+    expect(password).toHaveAccessibleDescription(rule);
+
+    await user.type(password, 'corta');
+    await user.tab();
+    expect(password).toHaveAccessibleDescription(
+      `${rule} La contraseña debe tener al menos 8 caracteres.`,
+    );
+  });
+
   it('muestra el error genérico con credenciales incorrectas', async () => {
     const user = userEvent.setup();
     renderApp('/login');

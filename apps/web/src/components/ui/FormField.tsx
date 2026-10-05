@@ -12,21 +12,31 @@ interface ControlProps {
 interface FormFieldProps {
   id: string;
   label: string;
+  /** Ayuda permanente bajo el control (p. ej. reglas de la contraseña). */
+  hint?: string;
   error?: string;
-  /** Recibe los atributos que conectan el control con su label y su error. */
+  /** Recibe los atributos que conectan el control con su label, su ayuda y su error. */
   children: (control: ControlProps) => ReactNode;
 }
 
-export function FormField({ id, label, error, children }: FormFieldProps) {
+export function FormField({ id, label, hint, error, children }: FormFieldProps) {
+  const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
+  const describedBy = [hint && hintId, error && errorId].filter(Boolean).join(' ');
+
   return (
     <div className="flex flex-col gap-1.5">
       <Label htmlFor={id}>{label}</Label>
       {children({
         id,
         'aria-invalid': Boolean(error),
-        'aria-describedby': error ? errorId : undefined,
+        'aria-describedby': describedBy || undefined,
       })}
+      {hint && (
+        <p id={hintId} className="text-[13px] text-text-muted">
+          {hint}
+        </p>
+      )}
       {error && (
         <p
           id={errorId}

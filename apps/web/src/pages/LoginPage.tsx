@@ -19,7 +19,10 @@ export function LoginPage() {
       <LoginForm />
       <p className="mt-6 text-center text-[15px]">
         ¿No tienes cuenta?{' '}
-        <Link to="/registro" className="font-semibold text-accent underline underline-offset-2">
+        <Link
+          to="/registro"
+          className="font-semibold text-text underline underline-offset-2 hover:decoration-primary hover:decoration-2"
+        >
           Crear cuenta
         </Link>
       </p>

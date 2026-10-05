@@ -43,7 +43,7 @@ snailracer/
 │   ├── web/                              # React + Vite + TS
 │   │   ├── src/
 │   │   │   ├── app/                      # App.tsx, router.tsx, providers.tsx
-│   │   │   ├── pages/                    # RegisterPage, LoginPage, DashboardPage (+ LazyDashboardPage), NotFoundPage
+│   │   │   ├── pages/                    # RegisterPage, LoginPage, DashboardPage (+ LazyDashboardPage), NotFoundPage, RouteErrorPage
 │   │   │   ├── features/
 │   │   │   │   ├── auth/
 │   │   │   │   │   ├── components/       # RegisterForm, LoginForm
@@ -56,7 +56,7 @@ snailracer/
 │   │   │   │   │   ├── ProtectedRoute.tsx
 │   │   │   │   │   └── PublicOnlyRoute.tsx
 │   │   │   │   ├── wallet/
-│   │   │   │   │   ├── components/       # BalanceCard, TopUpDialog, TopUpForm, ChargeHistory
+│   │   │   │   │   ├── components/       # BalanceCard, ChargeHistory, TopUpDialog (+ TopUpResult), TopUpForm (+ CardFields, AmountPicker)
 │   │   │   │   │   ├── snailpayClient.ts # charge(): valida con Zod, respuestas locales de error
 │   │   │   │   │   ├── walletService.ts  # applyChargeResult: suma solo si approved
 │   │   │   │   │   ├── statusMessages.ts # status_detail → mensaje en español
@@ -67,9 +67,10 @@ snailracer/
 │   │   │   │   │   └── useTopUp.ts       # estado del flujo de recarga
 │   │   │   │   └── stats/
 │   │   │   │       ├── components/       # BetsDonutChart, SnailWinsBarChart, RaceResultsList
+│   │   │   │       ├── chartColors.ts    # colores literales de Recharts (espejo de los tokens)
 │   │   │   │       ├── mockRaceDay.ts    # generador determinista del día
 │   │   │   │       └── snails.ts         # catálogo de 6 caracoles
-│   │   │   ├── components/ui/            # Button, Input, Card, Dialog, FormField, SubmitButton, Alert, LoadingScreen
+│   │   │   ├── components/ui/            # Button (+ buttonVariants), Input, Card, Dialog, FormField, SubmitButton, Alert, LoadingScreen, StatusPage
 │   │   │   ├── lib/                      # storage.ts, http.ts, env.ts, prng.ts, money.ts, useMediaQuery.ts
 │   │   │   ├── styles/index.css          # Tailwind + tokens de diseño
 │   │   │   ├── assets/                   # snailracer-logo.svg
@@ -150,6 +151,8 @@ Rutas desconocidas del API responden `404 { "error": "not_found" }`; JSON malfor
 | `*`          | —                                   | 404 con enlace de regreso                                    |
 
 La recarga es un **modal** dentro del dashboard, no una ruta.
+
+Todas las rutas cuelgan de una ruta padre sin path con `errorElement: <RouteErrorPage />`. Si una página lanza un error o no se puede descargar su chunk (p. ej. el dashboard sin conexión), se muestra "Algo salió mal" con "Recargar página" y "Volver al inicio", en lugar de una pantalla en blanco.
 
 ### Flujo de sesión
 

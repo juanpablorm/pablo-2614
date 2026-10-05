@@ -8,8 +8,8 @@ const cardVariants = cva('p-6 sm:p-8', {
   variants: {
     variant: {
       default: 'bg-surface text-text',
-      // Card destacada (saldo): fondo café, texto claro.
-      highlight: 'bg-text text-bg',
+      // Card destacada (saldo): fondo café, texto claro y foco naranja.
+      highlight: 'bg-text text-bg focus-on-dark',
     },
   },
   defaultVariants: { variant: 'default' },

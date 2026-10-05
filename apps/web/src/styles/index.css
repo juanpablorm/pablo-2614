@@ -2,6 +2,10 @@
 
 /* Tokens de diseño (docs/styles.md, sección 10). Generan utilidades como bg-surface o text-text. */
 @theme {
+  /* Solo existen los colores del proyecto: la paleta por defecto de Tailwind queda fuera. */
+  --color-*: initial;
+  --color-white: #fff;
+
   /* Base */
   --color-bg: #fdf2e7;
   --color-text: #432304;
@@ -41,6 +45,10 @@
   --shadow-cta: 0 4px 0 #b95332;
   --shadow-card: 0 8px 0 #d7c0a8;
   --shadow-modal: 0 24px 48px rgba(67, 35, 4, 0.35);
+  /* Halos de los íconos de estado del modal */
+  --shadow-ring-success: 0 0 0 10px #dcddc6;
+  --shadow-ring-error: 0 0 0 10px #f3d9cc;
+  --shadow-ring-warning: 0 0 0 10px #f2e1b8;
 
   /* Medidas */
   --container-content: 1200px;
@@ -74,9 +82,119 @@
     font-family: var(--font-display);
   }
 
+  /* Café sobre fondos claros (12.9:1). Los fondos oscuros definen --focus-color naranja. */
   :focus-visible {
-    outline: 3px solid var(--color-primary);
+    outline: 3px solid var(--focus-color, var(--color-text));
     outline-offset: 2px;
+  }
+}
+
+@utility focus-on-dark {
+  --focus-color: var(--color-primary);
+}
+
+/*
+ * Entrada de la marca en registro / login (styles.md §7). Prefijo sr-.
+ * El caracol cruza rápido inclinado hacia atrás, frena en seco (se clava hacia adelante,
+ * se aplasta y levanta polvo), rebota un poco y al final aparecen las letras.
+ */
+@keyframes sr-arrive {
+  0% {
+    transform: translateX(-70vw) skewX(14deg);
+    animation-timing-function: linear;
+  }
+  42% {
+    transform: translateX(-12px) skewX(14deg);
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  55% {
+    transform: translateX(14px) rotate(9deg) scale(1.06, 0.92);
+    animation-timing-function: ease-in-out;
+  }
+  72% {
+    transform: translateX(-4px) rotate(-3deg) scale(0.98, 1.03);
+    animation-timing-function: ease-in-out;
+  }
+  86% {
+    transform: translateX(2px) rotate(1deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* Líneas de velocidad: visibles mientras avanza, se esfuman al frenar. */
+@keyframes sr-speed {
+  0%,
+  38% {
+    opacity: 0.8;
+    transform: scaleX(1);
+  }
+  55%,
+  100% {
+    opacity: 0;
+    transform: scaleX(0.2);
+  }
+}
+
+/* Nubes de polvo del frenón: cada una sale hacia --sr-dx. */
+@keyframes sr-dust {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.3);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--sr-dx), -12px) scale(1.5);
+  }
+}
+
+@keyframes sr-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sr-arrive {
+  transform-origin: 50% 100%;
+  animation: sr-arrive 1.6s both;
+}
+
+.sr-speed {
+  transform-origin: 100% 50%;
+  animation: sr-speed 1.6s linear both;
+}
+
+.sr-dust {
+  opacity: 0;
+  animation: sr-dust 1s ease-out 0.65s both;
+}
+
+.sr-l {
+  display: inline-block;
+  opacity: 0;
+  animation: sr-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sr-arrive,
+  .sr-l {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .sr-speed,
+  .sr-dust {
+    display: none;
   }
 }
 

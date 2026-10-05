@@ -10,7 +10,10 @@ export function RegisterPage() {
       <RegisterForm />
       <p className="mt-6 text-center text-[15px]">
         ¿Ya tienes cuenta?{' '}
-        <Link to="/login" className="font-semibold text-accent underline underline-offset-2">
+        <Link
+          to="/login"
+          className="font-semibold text-text underline underline-offset-2 hover:decoration-primary hover:decoration-2"
+        >
           Inicia sesión
         </Link>
       </p>

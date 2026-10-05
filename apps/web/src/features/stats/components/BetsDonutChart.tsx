@@ -1,14 +1,12 @@
 import { Cell, Pie, PieChart } from 'recharts';
 
+import { CHART_COLORS } from '../chartColors';
 import type { BetsSummary } from '../mockRaceDay';
 
 import { DemoDataBadge } from './DemoDataBadge';
 
 const SIZE = 170;
 const RING = 20;
-// Recharts necesita el color literal: son los tokens secondary (ganadas) y accent (perdidas).
-const WON_COLOR = '#58613A';
-const LOST_COLOR = '#B95332';
 
 interface BetsDonutChartProps {
   summary: BetsSummary;
@@ -19,8 +17,8 @@ export function BetsDonutChart({ summary }: BetsDonutChartProps) {
   const { won, lost, total } = summary;
   const percentage = total === 0 ? 0 : Math.round((won / total) * 100);
   const data = [
-    { name: 'Ganadas', value: won, color: WON_COLOR },
-    { name: 'Perdidas', value: lost, color: LOST_COLOR },
+    { name: 'Ganadas', value: won, color: CHART_COLORS.won },
+    { name: 'Perdidas', value: lost, color: CHART_COLORS.lost },
   ];
 
   return (

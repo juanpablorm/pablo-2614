@@ -101,7 +101,7 @@ Se permite usar asistentes de IA para análisis, diseño, código, pruebas y doc
 | Gráfica de apuestas  | Donut con Recharts (styles.md actualizado).                                                                                                                               |
 | Datos de tarjeta     | Se guardan completos (ficticios) por requisito; UI enmascarada; el modal no promete "solo últimos 4".                                                                     |
 | Fuentes              | Auto-hospedadas con `@fontsource` (subconjunto latino).                                                                                                                   |
-| Logo                 | `snailracer-logo.svg`; prefijo de animaciones `sr-`.                                                                                                                      |
+| Logo                 | `snailracer-logo.svg`; prefijo de animaciones `sr-`. Entrada en login/registro: llega rápido, frena en seco con polvo y luego salen las letras; una vez por carga.        |
 | Contraseña y nombre  | Nombre 3–80 caracteres tras `trim`; contraseña 8–128 con mayúscula, minúscula y número (P4).                                                                              |
 | Caracoles            | Carloscol, Conchosio, Baberto, Lentejo, Espirolio y Snailio (P5). En celular las barras van horizontales para leer el nombre completo.                                    |
 | Carga del dashboard  | Diferida con `React.lazy` tras confirmar la sesión: Recharts va en su propio chunk y no se descarga en login/registro.                                                    |
@@ -130,5 +130,5 @@ Ninguna.
 | SnailPay (backend)                               | Hecho                                  |
 | Dashboard y gráficas                             | Hecho                                  |
 | Recarga de saldo (integración)                   | Hecho                                  |
-| Pulido de UI y accesibilidad                     | Pendiente                              |
+| Pulido de UI y accesibilidad                     | Hecho                                  |
 | README de ejecución                              | Básico (completo en la fase de pulido) |

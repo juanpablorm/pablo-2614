@@ -134,7 +134,7 @@ export function Dialog({
         aria-busy={busy}
         tabIndex={-1}
         className={cn(
-          'max-h-[calc(100dvh-2rem)] w-full max-w-[400px] overflow-y-auto bg-bg p-[30px] text-text shadow-modal',
+          'max-h-[calc(100dvh-2rem)] w-full max-w-[400px] overflow-y-auto bg-bg p-6 text-text shadow-modal sm:p-[30px]',
           className,
         )}
       >
@@ -152,7 +152,7 @@ export function DialogCloseButton({ className, ...props }: ComponentProps<'butto
       type="button"
       aria-label="Cerrar ventana"
       className={cn(
-        'flex size-(--touch-min) shrink-0 cursor-pointer items-center justify-center bg-surface text-text disabled:cursor-not-allowed disabled:opacity-60',
+        'flex size-(--touch-min) shrink-0 cursor-pointer items-center justify-center bg-surface text-text transition-colors hover:bg-surface-shadow disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-surface',
         className,
       )}
       {...props}

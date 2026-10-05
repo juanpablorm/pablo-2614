@@ -50,35 +50,41 @@ function Dashboard({ user, onLogout }: DashboardProps) {
 
   return (
     <div className="min-h-dvh">
-      <title>Dashboard · SnailRacer</title>
+      <title>Inicio · SnailRacer</title>
       <header className="border-b-2 border-surface">
         <div className="mx-auto flex min-h-20 max-w-(--container-content) flex-wrap items-center justify-between gap-4 px-4 py-3">
           <div className="flex items-center gap-3">
             <img src={logoUrl} alt="" width={42} height={42} className="size-[42px]" />
+            {/* "Racer" en óxido: el naranja no da contraste sobre el fondo claro. */}
             <span className="font-display text-2xl font-semibold">
-              Snail<span className="text-primary">Racer</span>
+              Snail<span className="text-accent">Racer</span>
             </span>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-2">
+          {/* En celular solo avatar y botón de ícono: el nombre ya está en el saludo. */}
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+            <span className="flex min-w-0 items-center gap-2">
               <span
                 aria-hidden="true"
-                className="flex size-10 items-center justify-center rounded-full bg-secondary font-display font-semibold text-bg"
+                className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary font-display font-semibold text-bg"
               >
                 {user.fullName.charAt(0).toUpperCase()}
               </span>
-              <span className="font-semibold">{user.fullName}</span>
+              <span className="hidden min-w-0 font-semibold break-words sm:inline">
+                {user.fullName}
+              </span>
             </span>
-            <Button variant="secondary" onClick={onLogout}>
+            <Button variant="secondary" onClick={onLogout} className="shrink-0 px-3 sm:px-4">
               <LogOut aria-hidden="true" className="size-4" />
-              Cerrar sesión
+              <span className="sr-only sm:not-sr-only">Cerrar sesión</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-(--container-content) px-4 py-10">
-        <h1 className="mb-8 text-[40px] font-semibold tracking-[-0.01em]">Hola, {user.fullName}</h1>
+      <main className="mx-auto max-w-(--container-content) px-4 py-8 sm:py-10">
+        <h1 className="mb-6 text-[28px] leading-tight font-semibold tracking-[-0.01em] break-words sm:mb-8 sm:text-[40px]">
+          Hola, {user.fullName}
+        </h1>
 
         <div className="grid gap-6 lg:grid-cols-3">
           <BalanceCard

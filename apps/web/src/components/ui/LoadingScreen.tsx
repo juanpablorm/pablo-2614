@@ -1,8 +1,11 @@
-/** Pantalla completa de espera (sesión o página que aún se descarga). */
+import { LoaderCircle } from 'lucide-react';
+
+/** Pantalla completa de espera mientras se descarga una página. */
 export function LoadingScreen() {
   return (
-    <div className="flex min-h-dvh items-center justify-center" aria-busy="true">
-      <span className="text-text-muted">Cargando…</span>
+    <div role="status" className="flex min-h-dvh items-center justify-center gap-3 text-text-muted">
+      <LoaderCircle aria-hidden="true" className="size-6 animate-spin" />
+      <span>Cargando…</span>
     </div>
   );
 }

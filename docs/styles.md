@@ -52,7 +52,7 @@ Archivo: `apps/web/src/assets/snailracer-logo.svg`.
 ### Reglas de uso
 
 - **Texto sobre naranja siempre café (`#432304`), nunca blanco.** Blanco sobre `#F07E13` da 2.7:1 y no pasa; café da 5.2:1.
-- **Texto naranja solo sobre fondos oscuros** (`#432304`), como "Racer" en el panel de marca. Sobre `#FDF2E7` no pasa contraste.
+- **Texto naranja solo sobre fondos oscuros** (`#432304`), como "Racer" en el panel de marca. Sobre `#FDF2E7` no pasa contraste (2.5:1): ahí el acento de texto **grande** va en `#B95332` (4.4:1), como el "Racer" del header y el "404".
 - **`#B95332` no se usa para texto pequeño** sobre superficies (3.5:1 sobre `#E9D8C7`). Para mensajes de error usa `#8F3A1F`; reserva `#B95332` para bordes, íconos, badges con texto blanco y la sombra del CTA.
 - **Significado consistente:** verde = ganado / aprobado; óxido = perdido / rechazado / error; dorado = líder / destacado / pendiente.
 - No distinguir estados solo por color: acompaña con ícono, texto o forma (en la leyenda de apuestas, Ganadas es un cuadro y Perdidas un círculo).
@@ -90,9 +90,9 @@ Las fuentes se **auto-hospedan** con los paquetes `@fontsource/fredoka` y `@font
 | ---------------------------- | ------- | --------------------------- | --------- | ----------- | ------------------ |
 | Hero 404                     | Fredoka | `clamp(120px, 18vw, 200px)` | 700       | 1           | -0.04em            |
 | Logotipo animado             | Fredoka | `clamp(48px, 5.4vw, 78px)`  | 600       | 1           | -0.02em            |
-| Monto de saldo               | Fredoka | 56px                        | 600       | 1           | -0.02em            |
+| Monto de saldo               | Fredoka | `clamp(40px, 12vw, 56px)`   | 600       | 1           | -0.02em            |
 | Porcentaje (efectividad)     | Fredoka | 48px                        | 600       | 1           | —                  |
-| H1 página (dashboard)        | Fredoka | 40px                        | 600       | —           | -0.01em            |
+| H1 página (dashboard)        | Fredoka | 40px (32px en celular)      | 600       | —           | -0.01em            |
 | H1 formulario                | Fredoka | 36px                        | 600       | 1.1         | -0.01em            |
 | H1 404                       | Fredoka | `clamp(30px, 3.4vw, 42px)`  | 600       | 1.12        | —                  |
 | H2 modal (estado)            | Fredoka | 28px                        | 600       | —           | —                  |
@@ -119,7 +119,7 @@ Las fuentes se **auto-hospedan** con los paquetes `@fontsource/fredoka` y `@font
 | Entre campos de formulario    | 18px                                  |
 | Bloques dentro de una card    | 20–28px                               |
 | Padding de card               | 32px (form: `clamp(28px, 4vw, 44px)`) |
-| Padding de modal              | 30px                                  |
+| Padding de modal              | 30px (24px en celular)                |
 | Gap entre cards del dashboard | 24px                                  |
 | Ancho máx. contenido          | 1200px                                |
 | Ancho máx. card de formulario | 470px                                 |
@@ -130,16 +130,19 @@ Excepciones circulares (`rounded-full`): avatar, íconos grandes de estado del m
 
 **Sombras** (sólidas, sin difuminado, salvo el modal):
 
-| Token            | Valor                               | Uso                                   |
-| ---------------- | ----------------------------------- | ------------------------------------- |
-| `--shadow-cta`   | `0 4px 0 #B95332`                   | Botón primario                        |
-| `--shadow-card`  | `0 8px 0 #D7C0A8`                   | Card de formulario (registro / login) |
-| `--shadow-modal` | `0 24px 48px rgba(67, 35, 4, 0.35)` | Modal                                 |
-| `--ring-success` | `0 0 0 10px #DCDDC6`                | Halo del ícono "aprobado"             |
-| `--ring-error`   | `0 0 0 10px #F3D9CC`                | Halo del ícono "rechazado"            |
-| `--ring-warning` | `0 0 0 10px #F2E1B8`                | Halo del ícono "timeout"              |
+| Token                   | Valor                               | Uso                                   |
+| ----------------------- | ----------------------------------- | ------------------------------------- |
+| `--shadow-cta`          | `0 4px 0 #B95332`                   | Botón primario                        |
+| `--shadow-card`         | `0 8px 0 #D7C0A8`                   | Card de formulario (registro / login) |
+| `--shadow-modal`        | `0 24px 48px rgba(67, 35, 4, 0.35)` | Modal                                 |
+| `--shadow-ring-success` | `0 0 0 10px #DCDDC6`                | Halo del ícono "aprobado"             |
+| `--shadow-ring-error`   | `0 0 0 10px #F3D9CC`                | Halo del ícono "rechazado"            |
+| `--shadow-ring-warning` | `0 0 0 10px #F2E1B8`                | Halo del ícono "timeout"              |
 
-**Foco:** `outline: 3px solid #F07E13; outline-offset: 2px` en inputs, enlaces y botones (aplicado globalmente con `:focus-visible`).
+**Foco:** `outline: 3px solid; outline-offset: 2px` en inputs, enlaces y botones, aplicado globalmente con `:focus-visible`. El color sale de `--focus-color`:
+
+- Fondos claros: `#432304` (12.9:1 sobre `#FDF2E7`). El naranja daba 2.5:1 y no alcanzaba el 3:1 de AA para indicadores de foco.
+- Fondos oscuros (card de saldo): `#F07E13` (5.2:1), con la utilidad `focus-on-dark` en el contenedor.
 
 ---
 
@@ -200,19 +203,19 @@ Padding `4px 12px`, 13px/700, radio 0.
 
 ### Tabla (historial de recargas)
 
-- Contenedor `#FDF2E7` con `overflow-x: auto`, ancho mín. 520px.
+- Contenedor `#FDF2E7` con `overflow-x: auto`, ancho mín. 520px. El contenedor es una región enfocable ("Tabla de recargas") para desplazarlo con teclado.
 - Celdas `14px 18px`, separador `1.5px solid #E9D8C7`.
 - Tarjeta siempre enmascarada (últimos 4 dígitos) con ícono de tarjeta en `#7A5634`. Formato `•••• 1234` en la columna "Tarjeta", sin detección de marca (P7). El CVV nunca se muestra.
 
 ### Header (dashboard)
 
 - Alto mín. 80px, borde inferior `2px solid #E9D8C7`.
-- Logo 42px + "SnailRacer" Fredoka 24px · avatar 40px (`#58613A`) + nombre · botón "Cerrar sesión".
+- Logo 42px + "SnailRacer" Fredoka 24px ("Racer" en `#B95332`) · avatar 40px (`#58613A`) + nombre · botón "Cerrar sesión". Debajo de 640px se ocultan el nombre (ya está en el saludo) y el texto del botón, que queda como ícono de 44px con el mismo nombre accesible.
 
 ### Panel de marca (registro / login)
 
 - Fondo `#432304`, contenido centrado.
-- Concha del logo grande (`clamp(160px, 18vw, 240px)`) + "Snail" en `#FDF2E7` y "Racer" en `#F07E13`.
+- Concha del logo grande (`clamp(96px, 18vw, 240px)`; en celular se compacta junto con el padding para que el formulario quede cerca del inicio) + "Snail" en `#FDF2E7` y "Racer" en `#F07E13`.
 - Pie legal 13px en `#E9D8C7`.
 
 ---
@@ -264,45 +267,21 @@ Es la única parte con explicación detallada; el resto del sitio usa el mínimo
 
 ## 7. Movimiento
 
-```css
-@keyframes sr-slide {
-  0% {
-    transform: translateX(-70vw) rotate(-360deg);
-  }
-  100% {
-    transform: translateX(0) rotate(0);
-  }
-}
-@keyframes sr-pop {
-  0% {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.sr-shell {
-  animation: sr-slide 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.sr-l {
-  display: inline-block;
-  opacity: 0;
-  animation: sr-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
+Las animaciones viven en `apps/web/src/styles/index.css` con prefijo `sr-`; el componente es `features/auth/components/AnimatedBrand.tsx`.
 
-@media (prefers-reduced-motion: reduce) {
-  .sr-shell,
-  .sr-l {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
-}
-```
+**Entrada de la marca** (registro / login): 1.6s para el caracol y luego las letras (unos 2.8s en total):
 
-- **Entrada del logo** (registro / login): la concha llega rodando en 1.6s; las letras aparecen una a una desde 1.35s, cada 70ms, con una pausa extra antes de "Racer". Corre una vez.
+| Momento    | Clase / keyframes | Qué pasa                                                                                                                                      |
+| ---------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0 → 0.67s  | `sr-arrive`       | El caracol entra desde `-70vw` a velocidad constante, inclinado hacia atrás (`skewX(14deg)`), con 3 líneas de velocidad (`sr-speed`).         |
+| 0.67→0.88s | `sr-arrive`       | **Frenón:** se pasa 14px, se clava hacia adelante (`rotate(9deg)`, eje en la base) y se aplasta (`scale(1.06, 0.92)`). Las líneas se esfuman. |
+| 0.65→1.65s | `sr-dust`         | Tres nubes de polvo (`#E9D8C7`) salen de la base hacia atrás y adelante.                                                                      |
+| 0.88→1.6s  | `sr-arrive`       | Rebote corto (`-4px`, `rotate(-3deg)`) y queda en su lugar.                                                                                   |
+| desde 1.5s | `sr-pop`          | Las letras aparecen una a una cada 80ms, con 160ms extra antes de "Racer".                                                                    |
+
+- Corre **una vez por carga de página**: al pasar de login a registro, o volver tras cerrar sesión, la marca ya aparece quieta.
+- El nombre se anuncia completo ("SnailRacer", `sr-only`); las letras sueltas, las líneas y el polvo son `aria-hidden`.
+- Con `prefers-reduced-motion: reduce` no hay movimiento: logo y letras aparecen en su lugar y no se pintan líneas ni polvo.
 - **Spinner** del botón procesando: rotación lineal de 0.9s, infinita.
 - Respetar siempre `prefers-reduced-motion` (además hay una regla global en `index.css` que reduce animaciones y transiciones).
 
@@ -311,7 +290,7 @@ Es la única parte con explicación detallada; el resto del sitio usa el mínimo
 ## 8. Layout responsivo
 
 - Páginas fluidas, no de ancho fijo; diseño base a 1440px.
-- **Auth:** dos columnas (`flex: 1 1 520px` marca / `flex: 1 1 560px` formulario) que se apilan en pantallas angostas.
+- **Auth:** desde 1024px, dos columnas (`flex: 1 1 520px` marca / `flex: 1 1 560px` formulario). Debajo se apilan en columna: la marca compacta y el formulario justo después; el espacio sobrante queda al final, no entre los dos.
 - **Dashboard:** filas de cards `flex-wrap` con proporción 1:2 (`flex: 1 1 340px` / `flex: 2 1 560px`); en celular quedan en una columna y la gráfica de victorias cambia a barras horizontales (< 640px).
 - El header hace wrap; la tabla hace scroll horizontal dentro de su caja.
 - Áreas táctiles de 44px como mínimo.
@@ -363,7 +342,10 @@ Equivalencia de referencia; la fuente de verdad es `apps/web/src/styles/index.cs
   --shadow-cta: 0 4px 0 #b95332;
   --shadow-card: 0 8px 0 #d7c0a8;
   --shadow-modal: 0 24px 48px rgba(67, 35, 4, 0.35);
-  --focus-ring: 3px solid #f07e13;
+  --focus-color: #432304; /* #f07e13 dentro de .focus-on-dark */
+  --shadow-ring-success: 0 0 0 10px #dcddc6;
+  --shadow-ring-error: 0 0 0 10px #f3d9cc;
+  --shadow-ring-warning: 0 0 0 10px #f2e1b8;
 
   /* Medidas */
   --container: 1200px;

@@ -55,6 +55,9 @@ describe('recarga de saldo', () => {
     expect(within(historyRegion()).getByText('Aún no tienes recargas.')).toBeInTheDocument();
 
     const dialog = await openTopUp(user);
+    expect(within(dialog).getByLabelText('Monto (MXN)')).toHaveAccessibleDescription(
+      'Mínimo $50.00',
+    );
     await fillForm(user, dialog, '1234123412341234');
 
     // Máscaras y nombre prellenado desde la sesión.
@@ -88,6 +91,12 @@ describe('recarga de saldo', () => {
     const history = historyRegion();
     expect(within(history).getByText('•••• 1234')).toBeInTheDocument();
     expect(within(history).getByText('Aprobada')).toBeInTheDocument();
+    // La tabla se desplaza con teclado en pantallas angostas.
+    expect(within(history).getByRole('region', { name: 'Tabla de recargas' })).toHaveAttribute(
+      'tabindex',
+      '0',
+    );
+    expect(within(history).getByRole('table', { name: 'Historial de recargas' })).toBeVisible();
     expect(history).not.toHaveTextContent('543');
     expect(history).not.toHaveTextContent('1234123412341234');
   });
