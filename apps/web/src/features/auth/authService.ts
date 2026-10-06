@@ -20,10 +20,7 @@ import { DEFAULT_PBKDF2_ITERATIONS, hashPassword, verifyPassword } from './passw
 export const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
 
 export type AuthErrorCode =
-  | 'email_taken'
-  | 'invalid_credentials'
-  | 'storage_unavailable'
-  | 'storage_corrupt';
+  'email_taken' | 'invalid_credentials' | 'storage_unavailable' | 'storage_corrupt';
 
 const AUTH_ERROR_MESSAGES: Record<AuthErrorCode, string> = {
   email_taken: 'Ya existe una cuenta con este correo.',

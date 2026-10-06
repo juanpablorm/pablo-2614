@@ -20,9 +20,7 @@ export function DashboardPage() {
   // ProtectedRoute garantiza la sesión; esto solo satisface al tipo.
   if (!user) return null;
   // key: si otra pestaña inicia sesión con otra cuenta, el saldo se vuelve a leer desde cero.
-  return (
-    <Dashboard key={user.id} user={user} onLogout={logout} onCorruptData={refreshSession} />
-  );
+  return <Dashboard key={user.id} user={user} onLogout={logout} onCorruptData={refreshSession} />;
 }
 
 interface DashboardProps {
