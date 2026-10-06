@@ -15,6 +15,7 @@
     "build": "npm run build -w @snailracer/shared && npm run build -w @snailracer/api && npm run build -w @snailracer/web",
     "typecheck": "npm run build -w @snailracer/shared && npm run typecheck --workspaces --if-present",
     "test": "npm run build -w @snailracer/shared && npm run test --workspaces --if-present",
+    "test:coverage": "npm run build -w @snailracer/shared && npm run test:coverage --workspaces --if-present",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

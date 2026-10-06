@@ -122,13 +122,13 @@ Ninguna.
 
 ## 8. Estado
 
-| Área                                             | Estado                                 |
-| ------------------------------------------------ | -------------------------------------- |
-| Documentación de contexto, arquitectura y API    | Hecho                                  |
-| Setup del monorepo                               | Hecho                                  |
-| Auth (registro, login, logout, rutas protegidas) | Hecho                                  |
-| SnailPay (backend)                               | Hecho                                  |
-| Dashboard y gráficas                             | Hecho                                  |
-| Recarga de saldo (integración)                   | Hecho                                  |
-| Pulido de UI y accesibilidad                     | Hecho                                  |
-| README de ejecución                              | Básico (completo en la fase de pulido) |
+| Área                                             | Estado |
+| ------------------------------------------------ | ------ |
+| Documentación de contexto, arquitectura y API    | Hecho  |
+| Setup del monorepo                               | Hecho  |
+| Auth (registro, login, logout, rutas protegidas) | Hecho  |
+| SnailPay (backend)                               | Hecho  |
+| Dashboard y gráficas                             | Hecho  |
+| Recarga de saldo (integración)                   | Hecho  |
+| Pulido de UI y accesibilidad                     | Hecho  |
+| README de ejecución                              | Hecho  |
