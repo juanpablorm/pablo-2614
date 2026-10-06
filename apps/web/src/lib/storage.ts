@@ -49,15 +49,33 @@ export const chargesSchema = z.array(chargeResponseSchema);
 
 // --- Acceso de bajo nivel ---
 
-function read<T>(key: string, schema: z.ZodType<T>): T | null {
+/**
+ * Estado de una clave. "corrupt" (JSON roto o forma inválida) se distingue de "missing"
+ * para no sobrescribir datos que existen pero no se pueden leer (docs/architecture.md §7).
+ */
+export type Stored<T> = { status: 'missing' } | { status: 'corrupt' } | { status: 'ok'; value: T };
+
+function load<T>(key: string, schema: z.ZodType<T>): Stored<T> {
+  let raw: string | null;
   try {
-    const raw = window.localStorage.getItem(key);
-    if (raw === null) return null;
-    const result = schema.safeParse(JSON.parse(raw));
-    return result.success ? result.data : null;
+    raw = window.localStorage.getItem(key);
   } catch {
-    return null;
+    // Almacenamiento bloqueado: no hay nada legible y las escrituras reportarán el fallo.
+    return { status: 'missing' };
   }
+  if (raw === null) return { status: 'missing' };
+
+  try {
+    const result = schema.safeParse(JSON.parse(raw));
+    return result.success ? { status: 'ok', value: result.data } : { status: 'corrupt' };
+  } catch {
+    return { status: 'corrupt' };
+  }
+}
+
+function read<T>(key: string, schema: z.ZodType<T>): T | null {
+  const stored = load(key, schema);
+  return stored.status === 'ok' ? stored.value : null;
 }
 
 function write(key: string, value: unknown): boolean {
@@ -80,18 +98,25 @@ function remove(key: string): boolean {
 
 // --- API pública ---
 
+// read* devuelve null si la clave falta o está corrupta; load* distingue ambos casos.
+
 export const readUsers = () => read(storageKeys.users, usersSchema);
+export const loadUsers = () => load(storageKeys.users, usersSchema);
 export const writeUsers = (users: StoredUsers) => write(storageKeys.users, users);
 
 export const readSession = () => read(storageKeys.session, sessionSchema);
+export const loadSession = () => load(storageKeys.session, sessionSchema);
 export const writeSession = (session: Session) => write(storageKeys.session, session);
 export const clearSession = () => remove(storageKeys.session);
 
 export const readWallet = (userId: string) => read(storageKeys.wallet(userId), walletSchema);
+export const loadWallet = (userId: string) => load(storageKeys.wallet(userId), walletSchema);
 export const writeWallet = (userId: string, wallet: Wallet) =>
   write(storageKeys.wallet(userId), wallet);
 
 export const readCharges = (userId: string): ChargeResponse[] | null =>
   read(storageKeys.charges(userId), chargesSchema);
+export const loadCharges = (userId: string): Stored<ChargeResponse[]> =>
+  load(storageKeys.charges(userId), chargesSchema);
 export const writeCharges = (userId: string, charges: ChargeResponse[]) =>
   write(storageKeys.charges(userId), charges);

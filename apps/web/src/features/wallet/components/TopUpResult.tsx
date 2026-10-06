@@ -48,7 +48,7 @@ export function ResultSummary({ response, applied, status }: ResultSummaryProps)
     ['Tarjeta', maskCardNumber(response.card_number)],
     ['Fecha', formatChargeDate(response.date_created)],
   ];
-  if (status === 'approved' && applied)
+  if (status === 'approved' && applied && !applied.corrupt)
     rows.push(['Nuevo saldo', formatCents(applied.balanceCents)]);
   rows.push(['Referencia', response.reference]);
 

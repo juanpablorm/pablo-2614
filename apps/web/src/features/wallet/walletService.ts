@@ -5,7 +5,7 @@
 import type { ChargeResponse } from '@snailracer/shared';
 
 import { addCents, toCents } from '@/lib/money';
-import { readCharges, readWallet, writeCharges, writeWallet } from '@/lib/storage';
+import { loadCharges, loadWallet, writeCharges, writeWallet } from '@/lib/storage';
 
 export interface WalletState {
   balanceCents: number;
@@ -14,18 +14,25 @@ export interface WalletState {
 }
 
 export interface ApplyChargeResult extends WalletState {
-  /** false si no se pudo guardar en LocalStorage (bloqueado o sin cuota). */
+  /** false si no se pudo guardar en LocalStorage (bloqueado, sin cuota o datos ilegibles). */
   persisted: boolean;
+  /**
+   * true si el saldo o el historial guardados no se pudieron leer: no se escribió nada y
+   * balanceCents / history no son válidos. Hay que revalidar la sesión (architecture.md §7).
+   */
+  corrupt: boolean;
 }
 
 /** Saldo del usuario en centavos. Sin wallet válido se muestra 0. */
 export function getBalanceCents(userId: string): number {
-  return readWallet(userId)?.balanceCents ?? 0;
+  const wallet = loadWallet(userId);
+  return wallet.status === 'ok' ? wallet.value.balanceCents : 0;
 }
 
 /** Historial de recargas, el más reciente primero. Sin historial válido, vacío. */
 export function getChargeHistory(userId: string): ChargeResponse[] {
-  return readCharges(userId) ?? [];
+  const charges = loadCharges(userId);
+  return charges.status === 'ok' ? charges.value : [];
 }
 
 /** Centavos que suma una respuesta: solo un "approved" con monto positivo; si no, 0. */
@@ -37,23 +44,30 @@ function creditedCents(response: ChargeResponse): number {
 
 /**
  * Guarda la respuesta en el historial y, solo si fue aprobada, suma su monto al saldo.
- * Una respuesta con un id ya registrado no se aplica de nuevo.
+ * Una respuesta con un id ya registrado no se aplica de nuevo. Si el saldo o el historial
+ * guardados están ilegibles, no se toca nada: sobrescribirlos perdería esos datos.
  */
 export function applyChargeResult(userId: string, response: ChargeResponse): ApplyChargeResult {
-  const balanceCents = getBalanceCents(userId);
-  const history = getChargeHistory(userId);
+  const wallet = loadWallet(userId);
+  const charges = loadCharges(userId);
+  if (wallet.status === 'corrupt' || charges.status === 'corrupt') {
+    return { balanceCents: 0, history: [], persisted: false, corrupt: true };
+  }
+
+  const balanceCents = wallet.status === 'ok' ? wallet.value.balanceCents : 0;
+  const history = charges.status === 'ok' ? charges.value : [];
 
   if (history.some((charge) => charge.id === response.id)) {
-    return { balanceCents, history, persisted: true };
+    return { balanceCents, history, persisted: true, corrupt: false };
   }
 
   const nextHistory = [response, ...history];
   let persisted = writeCharges(userId, nextHistory);
 
   const credit = creditedCents(response);
-  if (credit === 0) return { balanceCents, history: nextHistory, persisted };
+  if (credit === 0) return { balanceCents, history: nextHistory, persisted, corrupt: false };
 
   const nextBalance = addCents(balanceCents, credit);
   persisted = writeWallet(userId, { balanceCents: nextBalance }) && persisted;
-  return { balanceCents: nextBalance, history: nextHistory, persisted };
+  return { balanceCents: nextBalance, history: nextHistory, persisted, corrupt: false };
 }

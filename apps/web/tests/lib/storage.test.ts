@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  loadWallet,
   readSession,
   readUsers,
   readWallet,
@@ -44,6 +45,19 @@ describe('storage', () => {
 
     window.localStorage.setItem(storageKeys.users, JSON.stringify({ 'a@b.com': { id: 'x' } }));
     expect(readUsers()).toBeNull();
+  });
+
+  it('load* distingue entre ausente, corrupto y válido', () => {
+    expect(loadWallet(userId)).toEqual({ status: 'missing' });
+
+    window.localStorage.setItem(storageKeys.wallet(userId), '{no es json');
+    expect(loadWallet(userId)).toEqual({ status: 'corrupt' });
+
+    window.localStorage.setItem(storageKeys.wallet(userId), JSON.stringify({ balanceCents: -1 }));
+    expect(loadWallet(userId)).toEqual({ status: 'corrupt' });
+
+    writeWallet(userId, { balanceCents: 1250 });
+    expect(loadWallet(userId)).toEqual({ status: 'ok', value: { balanceCents: 1250 } });
   });
 
   it('no lanza si el almacenamiento está bloqueado', () => {

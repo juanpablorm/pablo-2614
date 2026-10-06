@@ -111,26 +111,76 @@ describe('authService', () => {
     const user = await service.register(account);
 
     now = new Date(now.getTime() + SESSION_TTL_MS - 1);
-    expect(service.getCurrentSession()).toEqual(user);
+    expect(service.restoreSession()).toEqual({ user, notice: null, expiresInMs: 1 });
 
     now = new Date(now.getTime() + 1);
-    expect(service.restoreSession()).toEqual({ user: null, expired: true });
+    expect(service.restoreSession()).toEqual({ user: null, notice: 'expired', expiresInMs: null });
     expect(readSession()).toBeNull();
   });
 
-  it('devuelve null si el usuario de la sesión ya no existe', async () => {
+  it('devuelve null sin aviso si el usuario de la sesión ya no existe', async () => {
     const service = createTestAuthService();
     await service.register(account);
     writeUsers({});
 
-    expect(service.getCurrentSession()).toBeNull();
+    expect(service.restoreSession()).toMatchObject({ user: null, notice: null });
     expect(readSession()).toBeNull();
   });
 
-  it('devuelve null si la sesión guardada está corrupta', () => {
+  it('descarta con aviso una sesión guardada corrupta', () => {
     window.localStorage.setItem(storageKeys.session, '{"userId": 42}');
 
-    expect(createTestAuthService().getCurrentSession()).toBeNull();
+    expect(createTestAuthService().restoreSession()).toMatchObject({
+      user: null,
+      notice: 'corrupt',
+    });
     expect(window.localStorage.getItem(storageKeys.session)).toBeNull();
+  });
+
+  describe('datos guardados ilegibles (architecture.md §7)', () => {
+    const corrupt = (key: string) => window.localStorage.setItem(key, '{no es json');
+
+    it.each([
+      ['usuarios', () => storageKeys.users],
+      ['saldo', (id: string) => storageKeys.wallet(id)],
+      ['historial', (id: string) => storageKeys.charges(id)],
+    ])('%s corruptos: descarta la sesión con aviso y no borra los datos', async (_name, key) => {
+      const service = createTestAuthService();
+      const user = await service.register(account);
+      corrupt(key(user.id));
+
+      expect(service.restoreSession()).toMatchObject({ user: null, notice: 'corrupt' });
+      expect(readSession()).toBeNull();
+      expect(window.localStorage.getItem(key(user.id))).toBe('{no es json');
+    });
+
+    it('con usuarios corruptos, registrarse no sobrescribe las cuentas existentes', async () => {
+      corrupt(storageKeys.users);
+
+      await expect(createTestAuthService().register(account)).rejects.toMatchObject({
+        code: 'storage_corrupt',
+      });
+      expect(window.localStorage.getItem(storageKeys.users)).toBe('{no es json');
+    });
+
+    it('con usuarios corruptos, el login lo dice en lugar del error de credenciales', async () => {
+      corrupt(storageKeys.users);
+
+      await expect(
+        createTestAuthService().login({ email: account.email, password: PASSWORD }),
+      ).rejects.toMatchObject({ code: 'storage_corrupt' });
+    });
+
+    it('con el saldo corrupto no inicia sesión', async () => {
+      const service = createTestAuthService();
+      const user = await service.register(account);
+      service.logout();
+      corrupt(storageKeys.wallet(user.id));
+
+      await expect(
+        service.login({ email: account.email, password: PASSWORD }),
+      ).rejects.toMatchObject({ code: 'storage_corrupt' });
+      expect(readSession()).toBeNull();
+    });
   });
 });

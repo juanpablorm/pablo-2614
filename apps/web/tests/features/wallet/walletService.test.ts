@@ -6,7 +6,7 @@ import {
   getBalanceCents,
   getChargeHistory,
 } from '@/features/wallet/walletService';
-import { readCharges, writeWallet } from '@/lib/storage';
+import { readCharges, storageKeys, writeWallet } from '@/lib/storage';
 
 import { chargeResponse, rejectedResponse, USER_ID } from './fixtures';
 
@@ -86,6 +86,20 @@ describe('walletService.applyChargeResult', () => {
 
     expect(again.balanceCents).toBe(25_050);
     expect(readCharges(USER_ID)).toHaveLength(1);
+  });
+
+  it.each([
+    ['saldo', storageKeys.wallet(USER_ID)],
+    ['historial', storageKeys.charges(USER_ID)],
+  ])('con el %s corrupto no escribe nada y lo marca', (_name, key) => {
+    writeWallet(USER_ID, { balanceCents: 5_000 });
+    window.localStorage.setItem(key, '{"balanceCents": "mucho"}');
+    const before = { ...window.localStorage };
+
+    const result = applyChargeResult(USER_ID, chargeResponse());
+
+    expect(result).toMatchObject({ corrupt: true, persisted: false });
+    expect({ ...window.localStorage }).toEqual(before);
   });
 
   it('avisa si no pudo guardar', () => {

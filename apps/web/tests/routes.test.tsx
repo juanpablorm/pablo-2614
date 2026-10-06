@@ -1,6 +1,8 @@
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
+import { storageKeys } from '@/lib/storage';
+
 import { createTestAuthService, renderApp } from './utils/renderApp';
 
 async function registerUser() {
@@ -78,6 +80,18 @@ describe('rutas', () => {
     expect(await screen.findByRole('status')).toHaveTextContent(
       'Tu sesión expiró. Inicia sesión de nuevo.',
     );
+  });
+
+  it('avisa en el login cuando los datos guardados están corruptos', async () => {
+    const user = await registerUser();
+    window.localStorage.setItem(storageKeys.wallet(user.id), '{no es json');
+
+    const { router } = renderApp('/dashboard');
+
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'No pudimos leer tus datos guardados en este navegador. Inicia sesión de nuevo.',
+    );
+    expect(router.state.location.pathname).toBe('/login');
   });
 
   it.each([

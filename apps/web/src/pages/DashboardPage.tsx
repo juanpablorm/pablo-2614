@@ -16,21 +16,26 @@ import { TopUpDialog } from '@/features/wallet/components/TopUpDialog';
 import { useWallet } from '@/features/wallet/useWallet';
 
 export function DashboardPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, refreshSession } = useAuth();
   // ProtectedRoute garantiza la sesión; esto solo satisface al tipo.
   if (!user) return null;
-  return <Dashboard user={user} onLogout={logout} />;
+  // key: si otra pestaña inicia sesión con otra cuenta, el saldo se vuelve a leer desde cero.
+  return (
+    <Dashboard key={user.id} user={user} onLogout={logout} onCorruptData={refreshSession} />
+  );
 }
 
 interface DashboardProps {
   user: PublicUser;
   onLogout: () => void;
+  /** Datos guardados ilegibles: revalidar la sesión, que manda a /login con aviso. */
+  onCorruptData: () => void;
 }
 
-function Dashboard({ user, onLogout }: DashboardProps) {
+function Dashboard({ user, onLogout, onCorruptData }: DashboardProps) {
   // La semilla es la fecha local: los datos no cambian al recargar durante el día.
   const raceDay = useMemo(() => generateRaceDay(toLocalDateSeed()), []);
-  const wallet = useWallet(user.id);
+  const wallet = useWallet(user.id, onCorruptData);
   const [topUpOpen, setTopUpOpen] = useState(false);
 
   const topUpButtonRef = useRef<HTMLButtonElement>(null);
