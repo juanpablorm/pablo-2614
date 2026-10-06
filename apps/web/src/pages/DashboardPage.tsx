@@ -85,7 +85,7 @@ function Dashboard({ user, onLogout, onCorruptData }: DashboardProps) {
       </header>
 
       <main className="mx-auto max-w-(--container-content) px-4 py-8 sm:py-10">
-        <h1 className="mb-6 text-[28px] leading-tight font-semibold tracking-[-0.01em] break-words sm:mb-8 sm:text-[40px]">
+        <h1 className="mb-6 text-[32px] leading-tight font-semibold tracking-[-0.01em] break-words sm:mb-8 sm:text-[40px]">
           Hola, {user.fullName}
         </h1>
 

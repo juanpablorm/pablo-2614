@@ -101,6 +101,9 @@ describe('recarga de saldo', () => {
       '0',
     );
     expect(within(history).getByRole('table', { name: 'Historial de recargas' })).toBeVisible();
+    // MXN una vez en el encabezado, no en cada celda (styles.md §9).
+    expect(within(history).getByRole('columnheader', { name: 'Monto (MXN)' })).toBeInTheDocument();
+    expect(within(history).getByText('$250.50')).toBeInTheDocument();
     expect(history).not.toHaveTextContent('543');
     expect(history).not.toHaveTextContent('1234123412341234');
   });

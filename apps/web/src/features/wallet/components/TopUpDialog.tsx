@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type RefObject } from 'react';
 import { Alert } from '@/components/ui/Alert';
 import { Dialog, DialogCloseButton } from '@/components/ui/Dialog';
 import type { PublicUser } from '@/features/auth/authService';
+import { cn } from '@/lib/cn';
 
 import { formatCardNumber } from '../cardFormat';
 import type { TopUpFormInput, TopUpFormValues } from '../schemas';
@@ -89,7 +90,11 @@ export function TopUpDialog({
       finalFocusRef={finalFocusRef}
     >
       <div className="mb-6 flex items-start justify-between gap-4">
-        <h2 id={TITLE_ID} className="text-[26px] leading-tight font-semibold">
+        {/* styles.md §2: 28px en el estado del resultado, 26px en el formulario. */}
+        <h2
+          id={TITLE_ID}
+          className={cn('leading-tight font-semibold', showResult ? 'text-[28px]' : 'text-[26px]')}
+        >
           {showResult ? message.title : 'Recargar saldo'}
         </h2>
         <DialogCloseButton onClick={onClose} disabled={submitting} />

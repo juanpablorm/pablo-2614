@@ -40,6 +40,15 @@
   --radius-xl: 0;
   --radius-2xl: 0;
   --radius-3xl: 0;
+  --radius-4xl: 0;
+
+  /* Spinner de 0.9s (styles.md §7); lo usan SubmitButton y LoadingScreen con animate-spin. */
+  --animate-spin: spin 0.9s linear infinite;
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 
   /* Elevación (sombras sólidas) */
   --shadow-cta: 0 4px 0 #b95332;

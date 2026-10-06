@@ -52,7 +52,7 @@ export function ChargeHistory({ history }: ChargeHistoryProps) {
               Fecha
             </th>
             <th scope="col" className={headerCell}>
-              Monto
+              Monto (MXN)
             </th>
             <th scope="col" className={headerCell}>
               Estado
