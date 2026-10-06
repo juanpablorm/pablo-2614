@@ -81,9 +81,9 @@ describe('rutas', () => {
   });
 
   it.each([
-    ['/login', 'Qué bueno verte', 'Iniciar sesión · SnailRacer'],
-    ['/registro', 'Únete a la carrera', 'Crear cuenta · SnailRacer'],
-    ['/pista-perdida', 'Este caracol se salió de la pista', 'Página no encontrada · SnailRacer'],
+    ['/login', 'Qué bueno verte', 'Iniciar sesión SnailRacer'],
+    ['/registro', 'Únete a la carrera', 'Crear cuenta SnailRacer'],
+    ['/pista-perdida', 'Este caracol se salió de la pista', 'Página no encontrada SnailRacer'],
   ])('%s tiene su propio título de página', async (path, heading, title) => {
     renderApp(path);
 
@@ -96,7 +96,7 @@ describe('rutas', () => {
     renderApp('/dashboard');
 
     await screen.findByRole('heading', { level: 1, name: 'Hola, Arturo Torres' });
-    expect(document.title).toBe('Inicio · SnailRacer');
+    expect(document.title).toBe('Inicio SnailRacer');
   });
 
   it('trata el logo de la marca como decorativo', async () => {

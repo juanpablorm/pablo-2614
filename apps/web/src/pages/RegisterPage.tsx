@@ -6,7 +6,7 @@ import { RegisterForm } from '@/features/auth/components/RegisterForm';
 export function RegisterPage() {
   return (
     <AuthLayout title="Únete a la carrera">
-      <title>Crear cuenta · SnailRacer</title>
+      <title>Crear cuenta SnailRacer</title>
       <RegisterForm />
       <p className="mt-6 text-center text-[15px]">
         ¿Ya tienes cuenta?{' '}

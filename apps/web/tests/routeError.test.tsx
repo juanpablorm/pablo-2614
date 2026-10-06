@@ -30,6 +30,6 @@ describe('pantalla de error de ruta', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Recargar página' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Volver al inicio' })).toHaveAttribute('href', '/');
-    expect(document.title).toBe('Algo salió mal · SnailRacer');
+    expect(document.title).toBe('Algo salió mal SnailRacer');
   });
 });

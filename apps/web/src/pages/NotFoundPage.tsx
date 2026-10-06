@@ -8,7 +8,7 @@ export function NotFoundPage() {
     <StatusPage
       hero="404"
       title="Este caracol se salió de la pista"
-      documentTitle="Página no encontrada · SnailRacer"
+      documentTitle="Página no encontrada SnailRacer"
     >
       <Link to="/" className={buttonVariants()}>
         Volver al inicio

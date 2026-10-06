@@ -10,7 +10,7 @@ export function LoginPage() {
 
   return (
     <AuthLayout title="Qué bueno verte">
-      <title>Iniciar sesión · SnailRacer</title>
+      <title>Iniciar sesión SnailRacer</title>
       {sessionExpired && (
         <Alert variant="info" className="mb-[18px]">
           Tu sesión expiró. Inicia sesión de nuevo.

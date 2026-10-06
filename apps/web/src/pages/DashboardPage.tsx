@@ -50,7 +50,7 @@ function Dashboard({ user, onLogout }: DashboardProps) {
 
   return (
     <div className="min-h-dvh">
-      <title>Inicio · SnailRacer</title>
+      <title>Inicio SnailRacer</title>
       <header className="border-b-2 border-surface">
         <div className="mx-auto flex min-h-20 max-w-(--container-content) flex-wrap items-center justify-between gap-4 px-4 py-3">
           <div className="flex items-center gap-3">
