@@ -70,6 +70,10 @@ describe('recarga de saldo', () => {
     const approved = await screen.findByRole('dialog', { name: '¡Recarga aprobada!' });
     expect(approved).toHaveTextContent('Se agregaron $250.50 a tu saldo.');
     expect(approved).toHaveTextContent('Código de autorización: A7K2Q9.');
+    // Confeti decorativo (styles.md §6): oculto para lectores de pantalla.
+    const confetti = approved.querySelectorAll('.sr-confetti');
+    expect(confetti).toHaveLength(14);
+    expect(confetti[0]?.closest('[aria-hidden="true"]')).not.toBeNull();
     expect(within(balanceRegion()).getByText('$250.50')).toBeInTheDocument();
 
     // payer_id y payer_email salen de la sesión, no del formulario.
@@ -114,6 +118,7 @@ describe('recarga de saldo', () => {
       'La tarjeta no tiene fondos suficientes. Prueba con otra tarjeta.',
     );
     expect(rejected).toHaveTextContent('No se hizo ningún cobro.');
+    expect(rejected.querySelector('.sr-confetti')).toBeNull();
     expect(within(balanceRegion()).getByText('$0.00')).toBeInTheDocument();
 
     await user.click(within(rejected).getByRole('button', { name: 'Cerrar' }));

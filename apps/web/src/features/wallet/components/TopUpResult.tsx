@@ -1,6 +1,6 @@
 import type { ChargeResponse } from '@snailracer/shared';
 import { Check, Clock, X } from 'lucide-react';
-import type { Ref } from 'react';
+import type { CSSProperties, Ref } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/cn';
@@ -20,18 +20,48 @@ const STATUS_ICON = {
   error: { Icon: Clock, className: 'bg-highlight text-text shadow-ring-warning' },
 } as const;
 
-/** Ícono de 92px con halo (styles.md §6). Decorativo: el título ya dice el resultado. */
+const CONFETTI_COLORS = ['bg-highlight', 'bg-primary', 'bg-secondary'] as const;
+const CONFETTI_PIECES = 14;
+
+/** Piezas repartidas en círculo alrededor del ícono. Posiciones fijas: no hay azar. */
+const CONFETTI = Array.from({ length: CONFETTI_PIECES }, (_, i) => {
+  const angle = (i / CONFETTI_PIECES) * 2 * Math.PI;
+  const distance = 72 + (i % 3) * 18;
+  return {
+    id: i,
+    color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+    style: {
+      '--sr-dx': `${Math.round(Math.cos(angle) * distance)}px`,
+      '--sr-dy': `${Math.round(Math.sin(angle) * distance)}px`,
+      '--sr-rot': `${(i % 2 === 0 ? -1 : 1) * (180 + i * 25)}deg`,
+      animationDelay: `${(i % 4) * 40}ms`,
+    } as CSSProperties,
+  };
+});
+
+/**
+ * Ícono de 92px con halo (styles.md §6); el aprobado suma confeti en dorado, naranja y verde.
+ * Decorativo: el título ya dice el resultado.
+ */
 export function StatusIcon({ status }: { status: ResultStatus }) {
   const { Icon, className } = STATUS_ICON[status];
   return (
     <div
       aria-hidden="true"
       className={cn(
-        'mx-auto mb-6 flex size-[92px] items-center justify-center rounded-full',
+        'relative mx-auto mb-6 flex size-[92px] items-center justify-center rounded-full',
         className,
       )}
     >
       <Icon className="size-11" strokeWidth={3} />
+      {status === 'approved' &&
+        CONFETTI.map(({ id, color, style }) => (
+          <span
+            key={id}
+            className={cn('sr-confetti absolute top-1/2 left-1/2 h-2.5 w-1.5', color)}
+            style={style}
+          />
+        ))}
     </div>
   );
 }
