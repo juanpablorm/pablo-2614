@@ -13,6 +13,9 @@ coverage/
 .env.*
 !.env.example
 
+# Diseño de referencia (no se versiona)
+docs/design/*.html
+
 # Editor / sistema
 .DS_Store
 Thumbs.db

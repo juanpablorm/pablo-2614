@@ -1,6 +1,6 @@
 # Diseño de referencia
 
-Coloca aquí el archivo HTML exportado con el diseño de las pantallas (`SnailRacer — Diseño web.html`):
+El diseño de las pantallas se hizo en un archivo HTML exportado:
 
 - Registro (`/registro`)
 - Login (`/login`)
@@ -8,4 +8,4 @@ Coloca aquí el archivo HTML exportado con el diseño de las pantallas (`SnailRa
 - 404
 - Modal de recarga (5 estados)
 
-Es solo referencia visual; las reglas que mandan están en [`../styles.md`](../styles.md). Esta carpeta se excluye de ESLint y Prettier.
+Ese archivo fue solo referencia visual y **no se incluye en el repositorio** (`.gitignore` ignora `docs/design/*.html`). Las reglas que mandan están en [`../styles.md`](../styles.md). Esta carpeta se excluye de ESLint y Prettier.
