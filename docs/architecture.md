@@ -42,11 +42,11 @@ snailracer/
 ├── apps/
 │   ├── web/                              # React + Vite + TS
 │   │   ├── src/
-│   │   │   ├── app/                      # App.tsx, router.tsx, providers.tsx
+│   │   │   ├── app/                      # App.tsx, router.tsx
 │   │   │   ├── pages/                    # RegisterPage, LoginPage, DashboardPage (+ LazyDashboardPage), NotFoundPage, RouteErrorPage
 │   │   │   ├── features/
 │   │   │   │   ├── auth/
-│   │   │   │   │   ├── components/       # RegisterForm, LoginForm
+│   │   │   │   │   ├── components/       # RegisterForm, LoginForm, PasswordInput, AuthLayout, AnimatedBrand
 │   │   │   │   │   ├── AuthContext.tsx   # estado de sesión + acciones
 │   │   │   │   │   ├── authContextValue.ts # contexto y tipos (separado por fast refresh)
 │   │   │   │   │   ├── useAuth.ts        # hook de acceso al contexto
@@ -66,11 +66,11 @@ snailracer/
 │   │   │   │   │   ├── useWallet.ts      # saldo e historial en estado de React
 │   │   │   │   │   └── useTopUp.ts       # estado del flujo de recarga
 │   │   │   │   └── stats/
-│   │   │   │       ├── components/       # BetsDonutChart, SnailWinsBarChart, RaceResultsList
+│   │   │   │       ├── components/       # BetsDonutChart, SnailWinsBarChart, RaceResultsList, DemoDataBadge
 │   │   │   │       ├── chartColors.ts    # colores literales de Recharts (espejo de los tokens)
 │   │   │   │       ├── mockRaceDay.ts    # generador determinista del día
 │   │   │   │       └── snails.ts         # catálogo de 6 caracoles
-│   │   │   ├── components/ui/            # Button (+ buttonVariants), Input, Card, Dialog, FormField, SubmitButton, Alert, LoadingScreen, StatusPage
+│   │   │   ├── components/ui/            # Button (+ buttonVariants), Input, Label, Card, Dialog, FormField, SubmitButton, Alert, LoadingScreen, StatusPage
 │   │   │   ├── lib/                      # storage.ts, http.ts, env.ts, prng.ts, money.ts, useMediaQuery.ts
 │   │   │   ├── styles/index.css          # Tailwind + tokens de diseño
 │   │   │   ├── assets/                   # snailracer-logo.svg
@@ -92,7 +92,7 @@ snailracer/
 │       │   │   └── idempotencyStore.ts   # keys en memoria con TTL (P1)
 │       │   ├── middlewares/              # errorHandler, notFound
 │       │   └── schemas/charge.schema.ts
-│       ├── tests/                        # charges, responseFactory, idempotencyStore, app, env
+│       ├── tests/                        # charges, responseFactory, idempotencyStore, app, env, externalReferences
 │       └── .env.example
 ├── packages/shared/                      # tipos del contrato SnailPay (request/response)
 ├── docs/
@@ -169,7 +169,8 @@ flowchart LR
 ```
 
 - Tras registrarse se inicia sesión automáticamente.
-- Sesión expirada o datos corruptos → se limpia la sesión y se envía a `/login` con un aviso.
+- Sesión expirada o datos corruptos (sesión, usuarios, saldo o historial) → se limpia la sesión y se envía a `/login` con un aviso. Los datos ilegibles no se borran ni se sobrescriben.
+- La sesión se revisa también con la app abierta: al llegar a `expiresAt`, cuando otra pestaña la cambia (evento `storage`) y al volver a la pestaña.
 
 ### Flujo de recarga
 
@@ -287,7 +288,7 @@ interface RaceDay {
 | Timeout (8 s)             | `snailpayClient`        | "La operación tardó demasiado. No se aplicó ningún cargo."            | No                |
 | Error de red              | `snailpayClient`        | "No pudimos conectar con el servicio de pagos." (`network_error`)     | No                |
 | Respuesta malformada      | Zod en `snailpayClient` | Mensaje genérico de error (`internal_error` local)                    | No                |
-| LocalStorage corrupto     | `storage.ts`            | Se limpia la sesión, se envía a login                                 | No                |
+| LocalStorage corrupto     | `storage.ts` (`load*`)  | Se limpia la sesión y el login avisa; nada se sobrescribe             | No                |
 
 ## 8. Despliegue (opcional)
 

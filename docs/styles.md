@@ -91,7 +91,7 @@ Las fuentes se **auto-hospedan** con los paquetes `@fontsource/fredoka` y `@font
 | Hero 404                     | Fredoka | `clamp(120px, 18vw, 200px)` | 700       | 1           | -0.04em            |
 | Logotipo animado             | Fredoka | `clamp(48px, 5.4vw, 78px)`  | 600       | 1           | -0.02em            |
 | Monto de saldo               | Fredoka | `clamp(40px, 12vw, 56px)`   | 600       | 1           | -0.02em            |
-| Porcentaje (efectividad)     | Fredoka | 48px                        | 600       | 1           | —                  |
+| Porcentaje (efectividad)     | Fredoka | 40px                        | 600       | 1           | —                  |
 | H1 página (dashboard)        | Fredoka | 40px (32px en celular)      | 600       | —           | -0.01em            |
 | H1 formulario                | Fredoka | 36px                        | 600       | 1.1         | -0.01em            |
 | H1 404                       | Fredoka | `clamp(30px, 3.4vw, 42px)`  | 600       | 1.12        | —                  |
@@ -332,13 +332,14 @@ Equivalencia de referencia; la fuente de verdad es `apps/web/src/styles/index.cs
   --color-surface-shadow: #d7c0a8;
   --color-input-disabled: #f4e7d9;
   --color-primary-disabled: #f3b47a;
+  --color-overlay: #977f6a;
 
   /* Tipografía */
   --font-display: 'Fredoka', sans-serif;
   --font-body: 'Figtree', sans-serif;
 
   /* Forma y elevación */
-  --radius: 0;
+  --radius-xs: 0; /* … hasta --radius-3xl: toda la escala vale 0 */
   --shadow-cta: 0 4px 0 #b95332;
   --shadow-card: 0 8px 0 #d7c0a8;
   --shadow-modal: 0 24px 48px rgba(67, 35, 4, 0.35);
@@ -348,7 +349,7 @@ Equivalencia de referencia; la fuente de verdad es `apps/web/src/styles/index.cs
   --shadow-ring-warning: 0 0 0 10px #f2e1b8;
 
   /* Medidas */
-  --container: 1200px;
+  --container-content: 1200px;
   --input-h: 50px;
   --btn-h: 54px;
   --touch-min: 44px;

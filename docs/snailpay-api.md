@@ -45,15 +45,15 @@ Comportamiento de la key (P1):
 
 ## 2. Solicitud
 
-| Campo             | Tipo   | Obligatorio | Regla de validación                                                                                                               |
-| ----------------- | ------ | ----------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `card_number`     | string | Sí          | Exactamente 16 dígitos; se eliminan espacios antes de validar. **No se aplica Luhn** (la tarjeta de prueba exitosa no lo cumple). |
-| `expiration_date` | string | Sí          | Formato `MM/YY`, mes de `01` a `12`.                                                                                              |
-| `cvv`             | string | Sí          | Exactamente 3 dígitos.                                                                                                            |
-| `cardholder_name` | string | Sí          | No vacío después de `trim`, máximo 80 caracteres.                                                                                 |
-| `amount`          | number | Sí          | Mayor que 0, máximo 2 decimales, máximo `10000`. En MXN.                                                                          |
-| `payer_id`        | string | Sí          | UUID del usuario registrado.                                                                                                      |
-| `payer_email`     | string | Sí          | Correo válido del usuario registrado.                                                                                             |
+| Campo             | Tipo   | Obligatorio | Regla de validación                                                                                                                       |
+| ----------------- | ------ | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `card_number`     | string | Sí          | Exactamente 16 dígitos; se eliminan espacios antes de validar. **No se aplica Luhn** (la tarjeta de prueba exitosa no lo cumple).         |
+| `expiration_date` | string | Sí          | Formato `MM/YY`, mes de `01` a `12`.                                                                                                      |
+| `cvv`             | string | Sí          | Exactamente 3 dígitos.                                                                                                                    |
+| `cardholder_name` | string | Sí          | No vacío después de `trim`, máximo 80 caracteres.                                                                                         |
+| `amount`          | number | Sí          | Mayor que 0 y máximo 2 decimales, en MXN. Montos mayores a `SNAILPAY_MAX_AMOUNT` (10,000) pasan esta validación y caen en el escenario 7. |
+| `payer_id`        | string | Sí          | UUID del usuario registrado.                                                                                                              |
+| `payer_email`     | string | Sí          | Correo válido del usuario registrado.                                                                                                     |
 
 ```json
 {

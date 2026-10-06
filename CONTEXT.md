@@ -22,18 +22,18 @@ Todo el estado del usuario (perfil, sesión, saldo, historial de recargas) vive 
 
 ## 2. Stack
 
-| Capa           | Tecnología                                                              |
-| -------------- | ----------------------------------------------------------------------- |
-| Frontend       | React + Vite + TypeScript (strict)                                      |
-| Rutas          | React Router                                                            |
-| Formularios    | React Hook Form + Zod                                                   |
-| UI             | Tailwind CSS + shadcn/ui, iconos lucide-react                           |
-| Gráficas       | Recharts                                                                |
-| Backend        | Express + TypeScript (tsx en desarrollo)                                |
-| Validación API | Zod                                                                     |
-| Pruebas        | Vitest, Supertest, React Testing Library                                |
-| Calidad        | ESLint + Prettier, Conventional Commits                                 |
-| Repo           | Monorepo con npm workspaces (`apps/web`, `apps/api`, `packages/shared`) |
+| Capa           | Tecnología                                                                          |
+| -------------- | ----------------------------------------------------------------------------------- |
+| Frontend       | React + Vite + TypeScript (strict)                                                  |
+| Rutas          | React Router                                                                        |
+| Formularios    | React Hook Form + Zod                                                               |
+| UI             | Tailwind CSS + componentes propios (cva, clsx, tailwind-merge), iconos lucide-react |
+| Gráficas       | Recharts                                                                            |
+| Backend        | Express + TypeScript (tsx en desarrollo)                                            |
+| Validación API | Zod                                                                                 |
+| Pruebas        | Vitest, Supertest, React Testing Library                                            |
+| Calidad        | ESLint + Prettier, Conventional Commits                                             |
+| Repo           | Monorepo con npm workspaces (`apps/web`, `apps/api`, `packages/shared`)             |
 
 El stack es fijo: React, Express, TypeScript en ambos lados y LocalStorage para el estado del usuario. No se agregan bases de datos ni servicios externos.
 
@@ -122,13 +122,14 @@ Ninguna.
 
 ## 8. Estado
 
-| Área                                             | Estado |
-| ------------------------------------------------ | ------ |
-| Documentación de contexto, arquitectura y API    | Hecho  |
-| Setup del monorepo                               | Hecho  |
-| Auth (registro, login, logout, rutas protegidas) | Hecho  |
-| SnailPay (backend)                               | Hecho  |
-| Dashboard y gráficas                             | Hecho  |
-| Recarga de saldo (integración)                   | Hecho  |
-| Pulido de UI y accesibilidad                     | Hecho  |
-| README de ejecución                              | Hecho  |
+| Área                                             | Estado                     |
+| ------------------------------------------------ | -------------------------- |
+| Documentación de contexto, arquitectura y API    | Hecho                      |
+| Setup del monorepo                               | Hecho                      |
+| Auth (registro, login, logout, rutas protegidas) | Hecho                      |
+| SnailPay (backend)                               | Hecho                      |
+| Dashboard y gráficas                             | Hecho                      |
+| Recarga de saldo (integración)                   | Hecho                      |
+| Pulido de UI y accesibilidad                     | Hecho                      |
+| README de ejecución                              | Hecho                      |
+| Despliegue en un solo proceso (architecture §8)  | No implementado (opcional) |
