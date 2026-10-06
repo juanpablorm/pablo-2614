@@ -49,6 +49,10 @@ export const chargesSchema = z.array(chargeResponseSchema);
 
 // --- Acceso de bajo nivel ---
 
+// Único punto de la app que toca LocalStorage: ESLint lo prohíbe en el resto (regla 8).
+// eslint-disable-next-line no-restricted-properties -- este es el acceso permitido
+const localStore = () => window.localStorage;
+
 /**
  * Estado de una clave. "corrupt" (JSON roto o forma inválida) se distingue de "missing"
  * para no sobrescribir datos que existen pero no se pueden leer (docs/architecture.md §7).
@@ -58,7 +62,7 @@ export type Stored<T> = { status: 'missing' } | { status: 'corrupt' } | { status
 function load<T>(key: string, schema: z.ZodType<T>): Stored<T> {
   let raw: string | null;
   try {
-    raw = window.localStorage.getItem(key);
+    raw = localStore().getItem(key);
   } catch {
     // Almacenamiento bloqueado: no hay nada legible y las escrituras reportarán el fallo.
     return { status: 'missing' };
@@ -80,7 +84,7 @@ function read<T>(key: string, schema: z.ZodType<T>): T | null {
 
 function write(key: string, value: unknown): boolean {
   try {
-    window.localStorage.setItem(key, JSON.stringify(value));
+    localStore().setItem(key, JSON.stringify(value));
     return true;
   } catch {
     return false;
@@ -89,7 +93,7 @@ function write(key: string, value: unknown): boolean {
 
 function remove(key: string): boolean {
   try {
-    window.localStorage.removeItem(key);
+    localStore().removeItem(key);
     return true;
   } catch {
     return false;

@@ -122,6 +122,62 @@ describe('recarga de saldo', () => {
     expect(within(balanceRegion()).getByText('$0.00')).toBeInTheDocument();
   });
 
+  it.each([
+    [
+      '503',
+      () =>
+        stubSnailpay(503, (request) =>
+          chargeResponse({
+            ...echo(request),
+            id: `spay_${crypto.randomUUID()}`,
+            status: 'error',
+            status_detail: 'service_unavailable',
+            authorization_code: null,
+          }),
+        ),
+      'Servicio no disponible',
+      'El servicio de pagos no está disponible en este momento.',
+    ],
+    [
+      'error de red',
+      () =>
+        vi.stubGlobal(
+          'fetch',
+          vi.fn(async () => {
+            throw new TypeError('Failed to fetch');
+          }),
+        ),
+      'No se pudo completar la recarga',
+      'No pudimos conectar con el servicio de pagos.',
+    ],
+  ])(
+    '%s: ofrece reintentar y el saldo no cambia (regla 1)',
+    async (_name, stub, title, message) => {
+      stub();
+      const user = await registerAndOpenDashboard();
+
+      const dialog = await openTopUp(user);
+      await fillForm(user, dialog, '1234123412341234');
+      await user.click(within(dialog).getByRole('button', { name: 'Recargar $250.50' }));
+
+      const failed = await screen.findByRole('alertdialog', { name: title });
+      expect(failed).toHaveTextContent(message);
+      expect(failed).toHaveTextContent('No se aplicó ningún cargo.');
+      expect(within(balanceRegion()).getByText('$0.00')).toBeInTheDocument();
+
+      // Reintentar es un intento nuevo con los mismos datos.
+      await user.click(within(failed).getByRole('button', { name: 'Reintentar' }));
+      const again = await screen.findByRole('alertdialog', { name: title });
+      expect(globalThis.fetch).toHaveBeenCalledTimes(2);
+
+      await user.click(within(again).getByRole('button', { name: 'Ver historial' }));
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Historial de recargas' })).toHaveFocus();
+      expect(within(historyRegion()).getAllByText('Error')).toHaveLength(2);
+      expect(within(balanceRegion()).getByText('$0.00')).toBeInTheDocument();
+    },
+  );
+
   it('deshabilita el botón mientras procesa: un doble clic cobra una sola vez', async () => {
     let respond: (response: Response) => void = () => {};
     const fetchMock = vi.fn(() => new Promise<Response>((resolve) => (respond = resolve)));

@@ -7,6 +7,15 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+// Regla 8 (CONTEXT.md) y architecture.md §3: LocalStorage solo en lib/storage.ts y fetch solo
+// en lib/http.ts. Esos dos archivos lo permiten con un eslint-disable explícito.
+const storageMessage = 'LocalStorage solo se usa desde lib/storage.ts (regla 8).';
+const fetchMessage = 'fetch solo se usa desde lib/http.ts (architecture.md §3).';
+const restrictedWebProperties = ['window', 'globalThis', 'self'].flatMap((object) => [
+  { object, property: 'localStorage', message: storageMessage },
+  { object, property: 'fetch', message: fetchMessage },
+]);
+
 export default defineConfig([
   globalIgnores(['**/dist/**', '**/coverage/**', 'docs/design/**']),
 
@@ -38,12 +47,26 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
 
+  {
+    files: ['apps/web/src/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        { name: 'localStorage', message: storageMessage },
+        { name: 'fetch', message: fetchMessage },
+      ],
+      'no-restricted-properties': ['error', ...restrictedWebProperties],
+    },
+  },
+
   // Datos simulados: deterministas con semilla (docs/architecture.md §6).
+  // Repite las restricciones de arriba: este bloque reemplaza la lista de la regla.
   {
     files: ['apps/web/src/lib/prng.ts', 'apps/web/src/features/stats/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-properties': [
         'error',
+        ...restrictedWebProperties,
         { object: 'Math', property: 'random', message: 'Usa createRng(seed) de lib/prng.ts.' },
       ],
     },

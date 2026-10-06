@@ -42,6 +42,7 @@ export async function postJson(
   // Se lee globalThis.fetch en cada llamada para poder sustituirlo en pruebas.
   const request = (async (): Promise<HttpResult> => {
     try {
+      // eslint-disable-next-line no-restricted-properties -- único acceso permitido a fetch
       const response = await globalThis.fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...headers },
