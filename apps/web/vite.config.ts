@@ -24,6 +24,8 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['tests/**/*.test.{ts,tsx}'],
     setupFiles: ['./tests/setup.ts'],
+    // Mayor que asyncUtilTimeout (tests/setup.ts): una prueba puede esperar varias veces el dashboard.
+    testTimeout: 20_000,
     css: false,
   },
 });
