@@ -52,7 +52,7 @@ Estas reglas son el núcleo del proyecto. Cada una tiene al menos una prueba aut
 7. **Los datos de las gráficas son congruentes:** 6 caracoles, 6 carreras, exactamente un ganador por carrera (las victorias suman 6). Las apuestas simuladas se resuelven contra esas mismas carreras.
 8. **Todo acceso a LocalStorage pasa por `lib/storage.ts`** y se valida con Zod al leer. Los componentes nunca llaman a `localStorage` directamente (ESLint lo prohíbe fuera de `storage.ts`). Datos guardados ilegibles nunca se sobrescriben.
 9. **Datos de tarjeta siempre ficticios.** El número y el CVV se devuelven en la respuesta y se guardan en LocalStorage por requisito del proyecto; en la UI se muestran enmascarados y el modal avisa que solo deben usarse tarjetas de prueba.
-10. **Sin referencias a terceros.** El repositorio y el código no contienen nombres, logotipos ni enlaces de organizaciones ajenas al proyecto. Las herramientas usadas sí pueden nombrarse (incluida la coautoría de IA en los commits). Las fuentes se auto-hospedan y no hay enlaces externos, salvo el del propio repositorio en el README (`apps/api/tests/externalReferences.test.ts`).
+10. **Sin referencias a terceros.** El repositorio y el código no contienen nombres, logotipos ni enlaces de organizaciones ajenas al proyecto. Las herramientas usadas sí pueden nombrarse (incluida la coautoría de IA en los commits). Las fuentes se auto-hospedan y no hay enlaces externos, salvo el del propio repositorio y el de la versión publicada (`apps/api/tests/externalReferences.test.ts`).
 
 ## 4. Fuera de alcance (no construir)
 
@@ -115,6 +115,7 @@ Se permite usar asistentes de IA para análisis, diseño, código, pruebas y doc
 | Idempotency-Key      | `Map` en memoria con TTL de 24 h y tope de 1,000 keys; misma key + mismo body → respuesta original; body distinto → 422; los 503/500 no se guardan (P1). En el cliente, Reintentar reenvía la misma key y un envío nuevo del formulario usa otra. |
 | Tarjeta `8888…`      | Tras `SNAILPAY_SLOW_DELAY_MS` responde 503 `service_unavailable`, nunca `approved` (P2).                                                                                                                                                          |
 | Contrato compartido  | `chargeResponseSchema` (Zod) vive en `packages/shared`: lo usan el frontend y las pruebas del API.                                                                                                                                                |
+| Despliegue           | Servidor propio con Docker: nginx sirve la web y reenvía `/api` a Express; Cloudflare Tunnel da HTTPS. Sin cambios en el código; los archivos de despliegue viven fuera del repo (architecture §8).                                               |
 
 ### Pendientes
 
@@ -122,14 +123,14 @@ Ninguna.
 
 ## 8. Estado
 
-| Área                                             | Estado                     |
-| ------------------------------------------------ | -------------------------- |
-| Documentación de contexto, arquitectura y API    | Hecho                      |
-| Setup del monorepo                               | Hecho                      |
-| Auth (registro, login, logout, rutas protegidas) | Hecho                      |
-| SnailPay (backend)                               | Hecho                      |
-| Dashboard y gráficas                             | Hecho                      |
-| Recarga de saldo (integración)                   | Hecho                      |
-| Pulido de UI y accesibilidad                     | Hecho                      |
-| README de ejecución                              | Hecho                      |
-| Despliegue en un solo proceso (architecture §8)  | No implementado (opcional) |
+| Área                                             | Estado |
+| ------------------------------------------------ | ------ |
+| Documentación de contexto, arquitectura y API    | Hecho  |
+| Setup del monorepo                               | Hecho  |
+| Auth (registro, login, logout, rutas protegidas) | Hecho  |
+| SnailPay (backend)                               | Hecho  |
+| Dashboard y gráficas                             | Hecho  |
+| Recarga de saldo (integración)                   | Hecho  |
+| Pulido de UI y accesibilidad                     | Hecho  |
+| README de ejecución                              | Hecho  |
+| Despliegue (architecture §8)                     | Hecho  |

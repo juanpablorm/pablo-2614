@@ -290,12 +290,23 @@ interface RaceDay {
 | Respuesta malformada      | Zod en `snailpayClient` | Mensaje genérico de error (`internal_error` local)                    | No                |
 | LocalStorage corrupto     | `storage.ts` (`load*`)  | Se limpia la sesión y el login avisa; nada se sobrescribe             | No                |
 
-## 8. Despliegue (opcional)
+## 8. Despliegue
 
-Un solo proceso: Express sirve el build estático de React y el API bajo `/api`. Una sola URL, sin CORS, un Dockerfile multi-etapa:
+La versión publicada está en [snail.devrios.pro](https://snail.devrios.pro), en un servidor propio con Ubuntu y Docker. Se desplegó sin cambios en el código:
 
-1. Etapa `build-web`: compila `apps/web`.
-2. Etapa `build-api`: compila `apps/api`.
-3. Imagen final con Node que copia ambos builds y ejecuta `server.js`.
+```text
+Navegador ──HTTPS──▶ Cloudflare ──Tunnel──▶ web (nginx) ──/api──▶ api (Express, :3001 interno)
+```
 
-HTTPS es obligatorio en la práctica porque `crypto.subtle` no funciona en HTTP.
+| Componente        | Qué hace                                                                                                                                                           |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Cloudflare Tunnel | Termina HTTPS y lleva el tráfico al servidor sin abrir puertos. HTTPS es obligatorio porque `crypto.subtle` no funciona en HTTP.                                   |
+| `web` (nginx)     | Sirve el build de Vite. Toda ruta que no es un archivo devuelve `index.html`, para que `/login`, `/registro` y `/dashboard` funcionen al recargar. Reenvía `/api`. |
+| `api` (Express)   | SnailPay. No publica puertos en el servidor: solo nginx lo alcanza, dentro de la red de Docker.                                                                    |
+
+- Web y API comparten origen: el navegador no necesita CORS y `VITE_API_BASE_URL` queda en `/api`. En el API solo cambia `CORS_ORIGIN`, que apunta al dominio público; las demás variables usan sus valores por defecto.
+- Dockerfile multi-etapa sobre `node:24-alpine`: `npm ci` y `npm run build`, dependencias de producción del API, imagen del API con usuario sin privilegios e imagen `nginx:stable-alpine` con el build de la web.
+- Ambos contenedores usan `restart: unless-stopped`.
+- **Los archivos de despliegue (`Dockerfile`, `nginx.conf`, `compose.yaml`) viven en el servidor, fuera del repositorio.** Actualizar la versión publicada es un paso manual.
+
+**Alternativa descartada:** un solo proceso en el que Express sirve también el build estático. Daba una sola URL sin CORS, pero exigía cambiar el código del API; con nginx delante se obtiene lo mismo sin tocarlo.

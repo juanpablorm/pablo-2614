@@ -2,6 +2,8 @@
 
 SnailRacer es una demo de apuestas en carreras de caracoles. Puedes registrarte, iniciar sesión, ver el dashboard con las carreras del día y recargar tu saldo con **SnailPay**, una pasarela de pagos **simulada** que corre en el backend. No hay base de datos ni pagos reales: usuarios y saldo viven en el navegador y todos los datos de tarjeta son ficticios.
 
+**Versión publicada:** [snail.devrios.pro](https://snail.devrios.pro).
+
 Antes de contribuir lee [`CONTEXT.md`](CONTEXT.md), que tiene las reglas del proyecto.
 
 ## Contenido
@@ -233,6 +235,8 @@ Las siguientes decisiones solo se aceptan porque esto es una simulación. Más d
 - Si los datos guardados están corruptos, no se sobrescriben: la app cierra la sesión y te manda a iniciar sesión con un aviso. Para empezar de cero, borra los datos del sitio.
 
 **Datos de tarjeta ficticios.** El número completo y el CVV se devuelven en la respuesta y se guardan en el historial porque así lo pide el alcance del proyecto. Eso contradice PCI DSS: en un sistema real solo se guardaría un token o los últimos 4 dígitos, y nunca el CVV. La UI los muestra enmascarados (`•••• 1234`) y el modal avisa que solo se usen tarjetas de prueba. **No ingreses datos reales.**
+
+**Despliegue.** La versión publicada corre en un servidor propio con Docker: nginx sirve la web y reenvía `/api` a Express, y Cloudflare Tunnel da el HTTPS que necesita Web Crypto. Los archivos de ese despliegue no están en el repositorio y cada actualización se hace a mano. Detalle en [`docs/architecture.md` §8](docs/architecture.md#8-despliegue).
 
 **Otras:**
 
