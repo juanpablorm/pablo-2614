@@ -230,7 +230,7 @@ Las siguientes decisiones solo se aceptan porque esto es una simulación. Más d
 - Los datos son por navegador y por origen: otro navegador o una ventana privada empiezan de cero.
 - Cualquiera puede editar su saldo desde las DevTools.
 - Cualquier script del mismo origen puede leerlos, así que un XSS los expondría.
-- Si los datos están corruptos, se descartan y la app te manda a iniciar sesión.
+- Si los datos guardados están corruptos, no se sobrescriben: la app cierra la sesión y te manda a iniciar sesión con un aviso. Para empezar de cero, borra los datos del sitio.
 
 **Datos de tarjeta ficticios.** El número completo y el CVV se devuelven en la respuesta y se guardan en el historial porque así lo pide el alcance del proyecto. Eso contradice PCI DSS: en un sistema real solo se guardaría un token o los últimos 4 dígitos, y nunca el CVV. La UI los muestra enmascarados (`•••• 1234`) y el modal avisa que solo se usen tarjetas de prueba. **No ingreses datos reales.**
 
