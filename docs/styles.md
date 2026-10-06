@@ -55,6 +55,7 @@ Archivo: `apps/web/src/assets/snailracer-logo.svg`.
 - **Texto naranja solo sobre fondos oscuros** (`#432304`), como "Racer" en el panel de marca. Sobre `#FDF2E7` no pasa contraste (2.5:1): ahí el acento de texto **grande** va en `#B95332` (4.4:1), como el "Racer" del header y el "404".
 - **`#B95332` no se usa para texto pequeño** sobre superficies (3.5:1 sobre `#E9D8C7`). Para mensajes de error usa `#8F3A1F`; reserva `#B95332` para bordes, íconos, badges con texto blanco y la sombra del CTA.
 - **Significado consistente:** verde = ganado / aprobado; óxido = perdido / rechazado / error; dorado = líder / destacado / pendiente.
+- **Colores de los caracoles:** cada uno tiene un color de identidad fijo (`snails.ts`) que se usa solo en el punto de "Resultados de las carreras". Esa lista siempre dice el ganador en texto, así que ahí el color identifica al caracol y no significa ganado, perdido ni líder.
 - No distinguir estados solo por color: acompaña con ícono, texto o forma (en la leyenda de apuestas, Ganadas es un cuadro y Perdidas un círculo).
 
 ### Contrastes verificados
@@ -113,17 +114,17 @@ Las fuentes se **auto-hospedan** con los paquetes `@fontsource/fredoka` y `@font
 **Espaciado** (múltiplos de 2 y 4):
 `4 · 6 · 8 · 10 · 12 · 14 · 16 · 18 · 20 · 24 · 28 · 32 · 40 · 48 · 56 · 72`
 
-| Contexto                      | Valor                                 |
-| ----------------------------- | ------------------------------------- |
-| Label → input                 | 6px                                   |
-| Entre campos de formulario    | 18px                                  |
-| Bloques dentro de una card    | 20–28px                               |
-| Padding de card               | 32px (form: `clamp(28px, 4vw, 44px)`) |
-| Padding de modal              | 30px (24px en celular)                |
-| Gap entre cards del dashboard | 24px                                  |
-| Ancho máx. contenido          | 1200px                                |
-| Ancho máx. card de formulario | 470px                                 |
-| Ancho del modal               | 400px                                 |
+| Contexto                      | Valor                                                                                       |
+| ----------------------------- | ------------------------------------------------------------------------------------------- |
+| Label → input                 | 6px                                                                                         |
+| Entre campos de formulario    | 18px                                                                                        |
+| Bloques dentro de una card    | 20–28px                                                                                     |
+| Padding de card               | 32px; 24px debajo de 640px para dejar ancho a las gráficas (form: `clamp(28px, 4vw, 44px)`) |
+| Padding de modal              | 30px (24px en celular)                                                                      |
+| Gap entre cards del dashboard | 24px                                                                                        |
+| Ancho máx. contenido          | 1200px                                                                                      |
+| Ancho máx. card de formulario | 470px                                                                                       |
+| Ancho del modal               | 400px                                                                                       |
 
 **Radios:** `0` en todo (cards, botones, inputs, badges, barras, modales). La escala `rounded-*` de Tailwind está fijada en 0.
 Excepciones circulares (`rounded-full`): avatar, íconos grandes de estado del modal y el marcador "Perdidas" de la leyenda.
@@ -245,13 +246,13 @@ Padding `4px 12px`, 13px/700, radio 0.
 
 Es la única parte con explicación detallada; el resto del sitio usa el mínimo de texto.
 
-| Estado          | Ícono                    | Título               | Acciones                                      |
-| --------------- | ------------------------ | -------------------- | --------------------------------------------- |
-| Formulario      | —                        | Recargar saldo       | Cancelar · **Recargar $X**                    |
-| Procesando      | Spinner en el botón      | Recargar saldo       | Todo deshabilitado; "No cierres esta ventana" |
-| Aprobado        | Check, círculo `#58613A` | ¡Recarga aprobada!   | **Listo**                                     |
-| Rechazado       | X, círculo `#B95332`     | Tarjeta rechazada    | **Probar con otra tarjeta** · Cerrar          |
-| Error / timeout | Reloj, círculo `#D9A52E` | Esto tardó demasiado | **Reintentar** · Ver historial                |
+| Estado          | Ícono                    | Título                                                                                         | Acciones                                      |
+| --------------- | ------------------------ | ---------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| Formulario      | —                        | Recargar saldo                                                                                 | Cancelar · **Recargar $X**                    |
+| Procesando      | Spinner en el botón      | Recargar saldo                                                                                 | Todo deshabilitado; "No cierres esta ventana" |
+| Aprobado        | Check, círculo `#58613A` | ¡Recarga aprobada!                                                                             | **Listo**                                     |
+| Rechazado       | X, círculo `#B95332`     | Tarjeta rechazada (402 de tarjeta) · Revisa los datos (400) · Monto no permitido (escenario 7) | **Probar con otra tarjeta** · Cerrar          |
+| Error / timeout | Reloj, círculo `#D9A52E` | Esto tardó demasiado                                                                           | **Reintentar** · Ver historial                |
 
 - Ícono de estado: 92px con halo de 10px (ver sombras).
 - **Formulario:** número de tarjeta, vencimiento, CVV, nombre en la tarjeta (prellenado con el nombre del usuario), chips de monto ($100, $200, $500, $1,000) + monto libre (mín. $50, sin tope en el cliente; P3).
@@ -291,7 +292,7 @@ Las animaciones viven en `apps/web/src/styles/index.css` con prefijo `sr-`; el c
 
 - Páginas fluidas, no de ancho fijo; diseño base a 1440px.
 - **Auth:** desde 1024px, dos columnas (`flex: 1 1 520px` marca / `flex: 1 1 560px` formulario). Debajo se apilan en columna: la marca compacta y el formulario justo después; el espacio sobrante queda al final, no entre los dos.
-- **Dashboard:** filas de cards `flex-wrap` con proporción 1:2 (`flex: 1 1 340px` / `flex: 2 1 560px`); en celular quedan en una columna y la gráfica de victorias cambia a barras horizontales (< 640px).
+- **Dashboard:** grid de 3 columnas desde 1024px con proporción 1:2: saldo y apuestas ocupan 1 columna, victorias y resultados 2, e historial las 3. Debajo de 1024px, una sola columna y la gráfica de victorias cambia a barras horizontales (< 640px).
 - El header hace wrap; la tabla hace scroll horizontal dentro de su caja.
 - Áreas táctiles de 44px como mínimo.
 
@@ -302,7 +303,8 @@ Las animaciones viven en `apps/web/src/styles/index.css` con prefijo `sr-`; el c
 - Español, tuteo, frases cortas. Nada de párrafos explicativos fuera del modal de recarga.
 - Errores directos: "Correo no válido.", "Las contraseñas no coinciden.", "Correo o contraseña incorrectos." (genérico en login, nunca decir cuál falló).
 - Guiños juguetones solo en títulos: "Únete a la carrera", "Qué bueno verte", "Este caracol se salió de la pista".
-- Montos con signo y dos decimales: `$1,250.00 MXN`. Fechas cortas: `2 oct 2026`.
+- Montos con signo y dos decimales: `$1,250.00`. "MXN" aparece una vez en la etiqueta o el encabezado ("Monto (MXN)", "MXN" bajo el saldo), no en cada monto.
+- Fechas cortas: `2 oct 2026`. El historial agrega la hora (`4 oct 2026, 13:20`) porque puede haber varias recargas el mismo día.
 
 ---
 
