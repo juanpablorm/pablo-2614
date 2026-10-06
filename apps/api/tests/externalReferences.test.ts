@@ -6,10 +6,13 @@ import { describe, expect, it } from 'vitest';
 
 /**
  * Regla 10 (CONTEXT.md): sin enlaces que identifiquen a terceros. Recorre el código y la
- * documentación del repo y solo admite URLs locales y el namespace de SVG.
+ * documentación del repo y solo admite URLs locales, el namespace de SVG y el propio repositorio.
  */
 
 const ROOT = fileURLToPath(new URL('../../..', import.meta.url));
+
+/** El `git clone` del README. */
+const OWN_REPOSITORY = 'https://github.com/juanpablorm/pablo-2614.git';
 
 const SCANNED = [
   'apps/api/src',
@@ -31,7 +34,8 @@ const isAllowed = (url: string) => {
     host === '127.0.0.1' ||
     // Ejemplo de IP de red local en la nota de Web Crypto.
     host.startsWith('192.168') ||
-    url === 'http://www.w3.org/2000/svg'
+    url === 'http://www.w3.org/2000/svg' ||
+    url === OWN_REPOSITORY
   );
 };
 
@@ -60,5 +64,8 @@ describe('referencias externas (regla 10)', () => {
   it('detecta un enlace externo', () => {
     expect(isAllowed('https://fonts.example.com/css')).toBe(false);
     expect(isAllowed('http://localhost:3001/api')).toBe(true);
+    // Solo el repositorio exacto: otra ruta del mismo host sigue siendo externa.
+    expect(isAllowed(OWN_REPOSITORY)).toBe(true);
+    expect(isAllowed('https://github.com/otra-cuenta/otro-repo')).toBe(false);
   });
 });

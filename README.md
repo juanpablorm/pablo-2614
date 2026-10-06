@@ -24,7 +24,7 @@ Antes de contribuir lee [`CONTEXT.md`](CONTEXT.md), que tiene las reglas del pro
 ## Instalación y ejecución
 
 ```bash
-git clone <url-del-repo>
+git clone https://github.com/juanpablorm/pablo-2614.git snailracer
 cd snailracer
 npm install
 npm run dev

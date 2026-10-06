@@ -52,7 +52,7 @@ Estas reglas son el núcleo del proyecto. Cada una tiene al menos una prueba aut
 7. **Los datos de las gráficas son congruentes:** 6 caracoles, 6 carreras, exactamente un ganador por carrera (las victorias suman 6). Las apuestas simuladas se resuelven contra esas mismas carreras.
 8. **Todo acceso a LocalStorage pasa por `lib/storage.ts`** y se valida con Zod al leer. Los componentes nunca llaman a `localStorage` directamente (ESLint lo prohíbe fuera de `storage.ts`). Datos guardados ilegibles nunca se sobrescriben.
 9. **Datos de tarjeta siempre ficticios.** El número y el CVV se devuelven en la respuesta y se guardan en LocalStorage por requisito del proyecto; en la UI se muestran enmascarados y el modal avisa que solo deben usarse tarjetas de prueba.
-10. **Sin referencias a terceros.** El repositorio y el código no contienen nombres, logotipos ni enlaces de organizaciones ajenas al proyecto. Las herramientas usadas sí pueden nombrarse (incluida la coautoría de IA en los commits). Las fuentes se auto-hospedan y no hay enlaces externos (`apps/api/tests/externalReferences.test.ts`).
+10. **Sin referencias a terceros.** El repositorio y el código no contienen nombres, logotipos ni enlaces de organizaciones ajenas al proyecto. Las herramientas usadas sí pueden nombrarse (incluida la coautoría de IA en los commits). Las fuentes se auto-hospedan y no hay enlaces externos, salvo el del propio repositorio en el README (`apps/api/tests/externalReferences.test.ts`).
 
 ## 4. Fuera de alcance (no construir)
 
