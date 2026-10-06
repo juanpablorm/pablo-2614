@@ -28,6 +28,12 @@ const echo = (request: ChargeRequest) => ({
   transaction_amount: request.amount,
 });
 
+/** Idempotency-Key de cada llamada a fetch, en orden. */
+const idempotencyKeys = () =>
+  vi
+    .mocked(globalThis.fetch)
+    .mock.calls.map(([, init]) => (init?.headers as Record<string, string>)['Idempotency-Key']);
+
 const balanceRegion = () => screen.getByRole('region', { name: 'Saldo disponible' });
 const historyRegion = () => screen.getByRole('region', { name: 'Historial de recargas' });
 
@@ -173,10 +179,13 @@ describe('recarga de saldo', () => {
       expect(failed).toHaveTextContent('No se aplicó ningún cargo.');
       expect(within(balanceRegion()).getByText('$0.00')).toBeInTheDocument();
 
-      // Reintentar es un intento nuevo con los mismos datos.
+      // Reintentar repite el mismo intento: mismos datos y misma Idempotency-Key.
       await user.click(within(failed).getByRole('button', { name: 'Reintentar' }));
       const again = await screen.findByRole('alertdialog', { name: title });
       expect(globalThis.fetch).toHaveBeenCalledTimes(2);
+      const [firstKey, retryKey] = idempotencyKeys();
+      expect(firstKey).toBeTruthy();
+      expect(retryKey).toBe(firstKey);
 
       await user.click(within(again).getByRole('button', { name: 'Ver historial' }));
       expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
@@ -185,6 +194,35 @@ describe('recarga de saldo', () => {
       expect(within(balanceRegion()).getByText('$0.00')).toBeInTheDocument();
     },
   );
+
+  it('un envío nuevo del formulario usa otra Idempotency-Key', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new TypeError('Failed to fetch');
+      }),
+    );
+    const title = 'No se pudo completar la recarga';
+    const user = await registerAndOpenDashboard();
+
+    const dialog = await openTopUp(user);
+    await fillForm(user, dialog, '1234123412341234');
+    await user.click(within(dialog).getByRole('button', { name: 'Recargar $250.50' }));
+    const failed = await screen.findByRole('alertdialog', { name: title });
+    await user.click(within(failed).getByRole('button', { name: 'Reintentar' }));
+    const again = await screen.findByRole('alertdialog', { name: title });
+    await user.click(within(again).getByRole('button', { name: 'Ver historial' }));
+
+    const reopened = await openTopUp(user);
+    await fillForm(user, reopened, '1234123412341234');
+    await user.click(within(reopened).getByRole('button', { name: 'Recargar $250.50' }));
+    await screen.findByRole('alertdialog', { name: title });
+
+    expect(globalThis.fetch).toHaveBeenCalledTimes(3);
+    const [first, retried, fresh] = idempotencyKeys();
+    expect(retried).toBe(first);
+    expect(fresh).not.toBe(first);
+  });
 
   it('deshabilita el botón mientras procesa: un doble clic cobra una sola vez', async () => {
     let respond: (response: Response) => void = () => {};

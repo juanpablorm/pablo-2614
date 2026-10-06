@@ -26,6 +26,11 @@ export interface SnailpayClientOptions {
   randomUUID?: () => string;
 }
 
+export interface ChargeOptions {
+  /** Idempotency-Key del intento. Si se omite se genera una nueva. */
+  idempotencyKey?: string;
+}
+
 export type SnailpayClient = ReturnType<typeof createSnailpayClient>;
 
 /** "2026-10-04T19:24:00.000Z" → "20261004" (fecha UTC, como el servidor). */
@@ -70,11 +75,14 @@ export function createSnailpayClient({
     };
   }
 
-  async function charge(request: ChargeRequest): Promise<ChargeResponse> {
+  async function charge(
+    request: ChargeRequest,
+    { idempotencyKey = randomUUID() }: ChargeOptions = {},
+  ): Promise<ChargeResponse> {
     const result = await postJson(chargesUrl, request, {
       timeoutMs,
-      // Una key nueva por intento: el servidor puede reconocer reenvíos del mismo intento.
-      headers: { 'Idempotency-Key': randomUUID() },
+      // Misma key = mismo intento: el servidor repite la respuesta original en lugar de cobrar otra vez.
+      headers: { 'Idempotency-Key': idempotencyKey },
     });
 
     if (result.kind === 'timeout') return buildLocalResponse(request, 'timeout');

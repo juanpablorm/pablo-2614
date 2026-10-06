@@ -197,6 +197,7 @@ $env:SNAILPAY_SIMULATE_OUTAGE="true"; npm run dev -w @snailracer/api
 - El cliente (`snailpayClient.ts`) usa `AbortController` con un límite de **8 segundos**.
 - Al abortar, genera localmente una `ChargeResponse` con `status: "error"`, `status_detail: "timeout"`, `authorization_code: null` y un `id` con prefijo `local_`.
 - El saldo **no cambia**. El mensaje indica que no se aplicó ningún cargo y que puede reintentar.
+- **Reintentar** reenvía la misma `Idempotency-Key`: si el primer intento sí se procesó, el servicio devuelve esa respuesta original en lugar de cobrar otra vez, y el cliente no aplica dos veces el mismo `id`. Un envío nuevo del formulario usa otra key.
 - Mejora futura en un sistema real: consultar el estado del cobro por `id` o `Idempotency-Key` antes de reintentar, para conciliar cobros que sí se procesaron del lado del servidor.
 
 ### Otras respuestas locales

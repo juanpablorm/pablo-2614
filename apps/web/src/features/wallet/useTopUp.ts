@@ -38,25 +38,28 @@ export function useTopUp({ user, onResult, client = defaultClient }: UseTopUpOpt
   const [state, setState] = useState<TopUpState>(IDLE);
   // Un ref (no solo el estado) bloquea el doble envío antes de que React vuelva a renderizar.
   const inFlight = useRef(false);
-  const lastValues = useRef<TopUpFormValues | null>(null);
+  const lastAttempt = useRef<{ values: TopUpFormValues; idempotencyKey: string } | null>(null);
 
-  const submit = useCallback(
-    async (values: TopUpFormValues) => {
+  const send = useCallback(
+    async (values: TopUpFormValues, idempotencyKey: string) => {
       if (inFlight.current) return;
       inFlight.current = true;
-      lastValues.current = values;
+      lastAttempt.current = { values, idempotencyKey };
       setState({ status: 'submitting', response: null, applied: null });
 
       try {
-        const response = await client.charge({
-          card_number: values.cardNumber,
-          expiration_date: values.expirationDate,
-          cvv: values.cvv,
-          cardholder_name: values.cardholderName,
-          amount: values.amount,
-          payer_id: user.id,
-          payer_email: user.email,
-        });
+        const response = await client.charge(
+          {
+            card_number: values.cardNumber,
+            expiration_date: values.expirationDate,
+            cvv: values.cvv,
+            cardholder_name: values.cardholderName,
+            amount: values.amount,
+            payer_id: user.id,
+            payer_email: user.email,
+          },
+          { idempotencyKey },
+        );
         const applied = onResult(response);
         setState({ status: toTopUpStatus(response), response, applied });
       } catch {
@@ -69,10 +72,20 @@ export function useTopUp({ user, onResult, client = defaultClient }: UseTopUpOpt
     [client, onResult, user.id, user.email],
   );
 
-  /** Repite el último envío como un intento nuevo (nueva Idempotency-Key). */
+  /** Envío del formulario: un intento nuevo, con su propia Idempotency-Key. */
+  const submit = useCallback(
+    (values: TopUpFormValues) => send(values, crypto.randomUUID()),
+    [send],
+  );
+
+  /**
+   * Repite el último intento con la misma Idempotency-Key. Tras un timeout o un error de red no
+   * se sabe si el servidor cobró: si lo hizo, devuelve la respuesta original y no cobra otra vez.
+   */
   const retry = useCallback(async () => {
-    if (lastValues.current) await submit(lastValues.current);
-  }, [submit]);
+    const attempt = lastAttempt.current;
+    if (attempt) await send(attempt.values, attempt.idempotencyKey);
+  }, [send]);
 
   const reset = useCallback(() => {
     if (!inFlight.current) setState(IDLE);

@@ -151,7 +151,7 @@ describe('snailpayClient.charge', () => {
     });
   });
 
-  it('envía el request a la ruta del contrato con un Idempotency-Key nuevo por intento', async () => {
+  it('envía el request a la ruta del contrato con un Idempotency-Key nuevo si no se indica', async () => {
     const fetchMock = vi.fn(async () => Response.json(rejectedResponse(), { status: 402 }));
     vi.stubGlobal('fetch', fetchMock);
     const client = createSnailpayClient({ apiBaseUrl: '/api' });
@@ -168,5 +168,17 @@ describe('snailpayClient.charge', () => {
     expect(firstKey).toMatch(/^[0-9a-f-]{36}$/);
     expect(secondKey).toMatch(/^[0-9a-f-]{36}$/);
     expect(firstKey).not.toBe(secondKey);
+  });
+
+  it('usa el Idempotency-Key indicado', async () => {
+    const fetchMock = vi.fn(async () => Response.json(rejectedResponse(), { status: 402 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const client = createSnailpayClient();
+
+    await client.charge(chargeRequest, { idempotencyKey: 'intento-1' });
+    await client.charge(chargeRequest, { idempotencyKey: 'intento-1' });
+
+    const keys = fetchMock.mock.calls.map((call) => headersOf(call)['Idempotency-Key']);
+    expect(keys).toEqual(['intento-1', 'intento-1']);
   });
 });
